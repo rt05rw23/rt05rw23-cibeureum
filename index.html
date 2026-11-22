@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Si-Cepat | Layanan Digital RT 05 RW 23 Cibeureum</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f1f5f9; color: #1e293b; line-height: 1.5; }
+    .app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; background: #ffffff; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); display: flex; flex-direction: column; }
+    .hero-header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2563eb 100%); color: #ffffff; padding: 28px 24px 44px 24px; border-bottom-left-radius: 28px; border-bottom-right-radius: 28px; }
+    .header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .badge-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); color: #eff6ff; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 99px; margin-bottom: 10px; }
+    .dot-green { width: 7px; height: 7px; background: #34d399; border-radius: 50%; }
+    .hero-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+    .hero-subtitle { font-size: 12px; color: #bfdbfe; margin-top: 2px; }
+    .btn-admin-link { display: inline-flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff; text-decoration: none; font-size: 12px; font-weight: 600; padding: 8px 12px; border-radius: 12px; white-space: nowrap; }
+    .header-status { margin-top: 16px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; justify-content: space-between; font-size: 11px; color: #bfdbfe; }
+    .tab-wrapper { padding: 0 20px; margin-top: -22px; }
+    .tab-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: #ffffff; padding: 6px; border-radius: 16px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0; }
+    .tab-btn { border: none; background: transparent; padding: 10px 6px; border-radius: 12px; font-size: 12px; font-weight: 700; color: #64748b; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: #1d4ed8; color: #ffffff; box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3); }
+    .main-content { padding: 24px; flex: 1; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .section-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+    .section-desc { font-size: 12px; color: #64748b; }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 6px; }
+    .form-control { width: 100%; padding: 11px 14px; font-size: 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; color: #0f172a; font-family: inherit; }
+    .form-control:focus { outline: none; background: #ffffff; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: none; border-radius: 12px; font-weight: 700; font-size: 13px; padding: 12px 16px; cursor: pointer; text-decoration: none; font-family: inherit; }
+    .btn-full { width: 100%; }
+    .btn-primary { background: #1d4ed8; color: #ffffff; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25); }
+    .btn-light { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
+    .btn-sm { padding: 7px 12px; font-size: 12px; border-radius: 10px; }
+    .btn-test { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-size: 11px; padding: 6px 10px; border-radius: 8px; }
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03); }
+    .badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
+    .badge-acc { background: #dbeafe; color: #1e40af; }
+    .badge-wait { background: #fef3c7; color: #92400e; }
+    .saldo-box { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); color: #ffffff; padding: 20px; border-radius: 20px; margin-bottom: 20px; }
+    .saldo-amount { font-size: 26px; font-weight: 800; margin: 4px 0; }
+    .kas-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 8px; }
+    .text-plus { color: #1d4ed8; font-weight: 700; font-size: 12px; }
+    .text-minus { color: #dc2626; font-weight: 700; font-size: 12px; }
+    .hidden { display: none !important; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .flex-gap { display: flex; gap: 8px; flex-wrap: wrap; }
+    .alert-box { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 16px; border-radius: 16px; margin-top: 16px; font-size: 13px; }
+    .footer { padding: 16px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header class="hero-header">
+      <div class="header-top">
+        <div>
+          <div class="badge-pill"><span class="dot-green"></span> Cetak Mandiri dari Rumah</div>
+          <h1 class="hero-title">RT 05 RW 23</h1>
+          <p class="hero-subtitle">Kel. Cibeureum, Kec. Cimahi Selatan, Kota Cimahi</p>
+        </div>
+        <a href="admin.html" class="btn-admin-link">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Admin RT
+        </a>
+      </div>
+      <div class="header-status">
+        <span>Sistem Administrasi Digital</span>
+        <span style="font-weight:700; color:#6ee7b7;">● Online (Supabase Cloud)</span>
+      </div>
+    </header>
+
+    <div class="tab-wrapper">
+      <div class="tab-bar">
+        <button onclick="switchTab('ajukan')" id="tab-ajukan" class="tab-btn active">Ajukan Surat</button>
+        <button onclick="switchTab('cek')" id="tab-cek" class="tab-btn">Cetak Surat</button>
+        <button onclick="switchTab('kas')" id="tab-kas" class="tab-btn">Kas RT</button>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <div id="view-ajukan">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Formulir Permohonan</h2>
+            <p class="section-desc">Isi data diri sesuai KTP/KK</p>
+          </div>
+          <button type="button" onclick="isiDataTest()" class="btn btn-test">✨ Isi Data Test</button>
+        </div>
+
+        <form id="formSurat">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap (Sesuai KTP)</label>
+            <input type="text" id="nama" class="form-control" required placeholder="Contoh: Dendi Agam Saputra">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nomor Induk Kependudukan (NIK)</label>
+            <input type="number" id="nik" class="form-control" required placeholder="327701xxxxxxxxxx">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tempat, Tanggal Lahir</label>
+            <input type="text" id="ttl" class="form-control" required placeholder="Cimahi, 20 Agustus 1999">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Alamat Lengkap</label>
+            <textarea id="alamat" rows="2" class="form-control" required placeholder="Kp. Cibeureum RT 05 RW 23 No. 12"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Keperluan Surat Pengantar</label>
+            <select id="keperluan" class="form-control" required>
+              <option value="Pengantar Administrasi KTP / KK (Lapakami)">Pengantar Administrasi KTP / KK (Lapakami)</option>
+              <option value="Pengantar Pembuatan SKCK">Pengantar Pembuatan SKCK</option>
+              <option value="Surat Keterangan Domisili Warga">Surat Keterangan Domisili Warga</option>
+              <option value="Surat Keterangan Tidak Mampu (SKTM)">Surat Keterangan Tidak Mampu (SKTM)</option>
+              <option value="Pengantar Nikah (N1 - N4)">Pengantar Nikah (N1 - N4)</option>
+            </select>
+          </div>
+          <button type="submit" id="btnSubmit" class="btn btn-primary btn-full" style="margin-top:8px;">
+            Kirim Pengajuan Surat
+          </button>
+        </form>
+
+        <div id="notifSukses" class="alert-box hidden">
+          <strong style="display:block; margin-bottom:4px;">✅ Pengajuan Berhasil Terkirim!</strong>
+          <p id="detailNotif" style="font-size:12px; margin-bottom:10px;"></p>
+          <div class="flex-gap">
+            <button onclick="switchTab('cek')" class="btn btn-primary btn-sm">Cek Status</button>
+            <a href="admin.html" class="btn btn-light btn-sm">Buka Panel Admin (ACC) &rarr;</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-cek" class="hidden">
+        <div style="margin-bottom:16px;">
+          <h2 class="section-title">Cetak & Pantau Status</h2>
+          <p class="section-desc">Masukkan NIK Anda untuk mencetak surat yang sudah di-ACC Ketua RT.</p>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:16px;">
+          <input type="number" id="cariNik" class="form-control" placeholder="Masukkan 16 digit NIK...">
+          <button onclick="cariSurat()" class="btn btn-primary">Cari</button>
+        </div>
+        <div id="hasilCari"></div>
+      </div>
+
+      <div id="view-kas" class="hidden">
+        <div class="saldo-box">
+          <p style="font-size:12px; color:#bfdbfe;">Saldo Kas RT 05 RW 23</p>
+          <div id="totalSaldo" class="saldo-amount">Rp 0</div>
+          <p style="font-size:11px; color:#dbeafe;">Transparansi Keuangan Warga • Real-Time</p>
+        </div>
+        <h3 style="font-size:12px; color:#64748b; text-transform:uppercase; margin-bottom:10px;">Mutasi Transaksi Terbaru</h3>
+        <div id="listKasWarga"></div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      &copy; 2026 Pengurus RT 05 RW 23 Kel. Cibeureum, Kota Cimahi
+    </footer>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://cvdrewujvyxsmpbnswtw.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_bdWg4K4V29MNj5SLtVlImA_1cpcogD1';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function switchTab(tab) {
+      ['ajukan', 'cek', 'kas'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add('hidden');
+        document.getElementById(`tab-${t}`).classList.remove('active');
+      });
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).classList.add('active');
+      if (tab === 'kas') loadKasWarga();
+      if (tab === 'cek' && document.getElementById('cariNik').value) cariSurat();
+    }
+
+    function isiDataTest() {
+      document.getElementById('nama').value = 'Ahmad Fauzi Hidayat';
+      document.getElementById('nik').value = '3277011508950004';
+      document.getElementById('ttl').value = 'Cimahi, 15 Agustus 1995';
+      document.getElementById('alamat').value = 'Kp. Cibeureum RT 05 RW 23 No. 18, Kel. Cibeureum, Cimahi Selatan';
+      document.getElementById('keperluan').selectedIndex = 0;
+    }
+
+    document.getElementById('formSurat').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true;
+      btn.innerText = 'Memproses...';
+
+      const now = new Date();
+      const nomorSurat = `${Math.floor(100 + Math.random() * 900)}/RT05-RW23/${now.getMonth() + 1}/${now.getFullYear()}`;
+      const nikInput = document.getElementById('nik').value.trim();
+
+      const payload = {
+        nomor_surat: nomorSurat,
+        nama_lengkap: document.getElementById('nama').value.trim(),
+        nik: nikInput,
+        tempat_tgl_lahir: document.getElementById('ttl').value.trim(),
+        alamat: document.getElementById('alamat').value.trim(),
+        keperluan: document.getElementById('keperluan').value,
+        status: 'Menunggu'
+      };
+
+      const { error } = await supabaseClient.from('pengajuan_surat').insert([payload]);
+      
+      btn.disabled = false;
+      btn.innerText = 'Kirim Pengajuan Surat';
+
+      if (error) {
+        alert('Gagal mengirim: ' + error.message);
+        return;
+      }
+
+      document.getElementById('formSurat').reset();
+      document.getElementById('cariNik').value = nikInput;
+      document.getElementById('notifSukses').classList.remove('hidden');
+      document.getElementById('detailNotif').innerHTML = `Nomor Register: <b>${nomorSurat}</b>. Status saat ini: <b>Menunggu Persetujuan Ketua RT</b>.`;
+    });
+
+    async function cariSurat() {
+      const nik = document.getElementById('cariNik').value.trim();
+      const wadah = document.getElementById('hasilCari');
+      if (!nik) return;
+
+      wadah.innerHTML = '<p style="font-size:12px; color:#64748b; text-align:center;">Mencari data...</p>';
+      const { data, error } = await supabaseClient
+        .from('pengajuan_surat')
+        .select('*')
+        .eq('nik', nik)
+        .order('created_at', { ascending: false });
+
+      if (error || !data || !data.length) {
+        wadah.innerHTML = '<div class="card" style="text-align:center; font-size:12px; color:#64748b;">Data pengajuan dengan NIK tersebut tidak ditemukan.</div>';
+        return;
+      }
+
+      wadah.innerHTML = data.map(item => {
+        const isAcc = item.status === 'Disetujui';
+        const badge = isAcc ? '<span class="badge badge-acc">✓ Disetujui RT</span>' : '<span class="badge badge-wait">⏳ Menunggu ACC</span>';
+        const aksi = isAcc ? `<a href="surat.html?id=${item.id}" class="btn btn-primary btn-sm">🖨️ Buka & Cetak PDF</a>` : `<span style="font-size:11px; color:#94a3b8; font-style:italic;">Belum dapat dicetak</span>`;
+
+        return `
+          <div class="card">
+            <div class="flex-between" style="margin-bottom:6px; gap:8px;">
+              <strong style="font-size:14px; color:#0f172a;">${item.keperluan}</strong>
+              ${badge}
+            </div>
+            <p style="font-size:12px; color:#64748b; margin-bottom:12px;">No: ${item.nomor_surat}</p>
+            <div class="flex-between" style="padding-top:10px; border-top:1px solid #f1f5f9;">
+              <span style="font-size:11px; color:#64748b;">${item.nama_lengkap}</span>
+              ${aksi}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadKasWarga() {
+      const { data, error } = await supabaseClient
+        .from('kas_rt')
+        .select('*')
+        .order('tanggal', { ascending: false });
+
+      if (error || !data) return;
+
+      let saldo = 0;
+      data.forEach(d => {
+        saldo += d.jenis === 'Masuk' ? Number(d.nominal) : -Number(d.nominal);
+      });
+
+      document.getElementById('totalSaldo').innerText = 'Rp ' + saldo.toLocaleString('id-ID');
+
+      const listEl = document.getElementById('listKasWarga');
+      if (!data.length) {
+        listEl.innerHTML = '<p style="font-size:12px; color:#94a3b8; text-align:center;">Belum ada catatan transaksi.</p>';
+        return;
+      }
+
+      listEl.innerHTML = data.map(item => {
+        const isMasuk = item.jenis === 'Masuk';
+        return `
+          <div class="kas-item">
+            <div>
+              <div style="font-size:13px; font-weight:600; color:#1e293b;">${item.keterangan}</div>
+              <div style="font-size:11px; color:#94a3b8;">${item.tanggal}</div>
+            </div>
+            <span class="${isMasuk ? 'text-plus' : 'text-minus'}">
+              ${isMasuk ? '+' : '-'} Rp ${Number(item.nominal).toLocaleString('id-ID')}
+            </span>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>
