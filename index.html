@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart RT — Portal Lingkungan Minimalis</title>
+  <title>Smart RT — Mode Pengujian Cepat</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
   <style>
@@ -18,226 +18,128 @@
     <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
         <div class="w-8 h-8 rounded-lg bg-[#1B4332] text-white flex items-center justify-center font-heading font-bold text-sm">RT</div>
-        <span class="font-heading font-bold text-slate-900">Smart RT</span>
+        <span class="font-heading font-bold text-slate-900">Smart RT — Panel Test</span>
       </div>
-      <div class="flex items-center gap-3">
-        <button onclick="openAdminLogin()" class="text-xs font-semibold text-[#1B4332] hover:underline">
-          Akses Pengurus
-        </button>
-        <button onclick="openPortalChoice()" class="bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium px-5 py-2 rounded-full transition">
-          Masuk Portal Warga
-        </button>
-      </div>
+      <span class="text-xs bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-medium">Bypass Login Aktif</span>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <main class="max-w-5xl mx-auto px-6 py-16">
+  <!-- Hero Section & Navigasi Pengujian -->
+  <main class="max-w-5xl mx-auto px-6 py-12 space-y-8">
     <div class="max-w-xl">
       <span class="inline-block px-3 py-1 rounded-full bg-[#E9F5DB] text-[#1B4332] text-xs font-medium mb-4">
-        Digitalisasi Rukun Tetangga Terpadu
+        Mode Pengujian Sistem Tanpa Login
       </span>
-      <h1 class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight mb-4">
-        Satu portal untuk warga dan pengurus lingkungan.
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight leading-tight mb-3">
+        Pilih Halaman Dashboard untuk Diuji
       </h1>
-      <p class="text-slate-500 text-base leading-relaxed mb-8">
-        Pengajuan surat pengantar mandiri terverifikasi, transparansi kas real-time, dan manajemen administrasi lingkungan yang rapi.
+      <p class="text-slate-500 text-sm leading-relaxed mb-6">
+        Gunakan tombol di bawah untuk langsung berpindah ke halaman page yang ingin diuji, atau lakukan pendaftaran mandiri warga baru di panel sebelah kanan.
       </p>
-      <div class="flex flex-wrap gap-3">
-        <button onclick="openPortalChoice()" class="bg-[#1B4332] text-white px-6 py-3 rounded-xl text-sm font-medium hover:bg-[#143326] transition shadow-sm">
-          Mulai Portal Warga →
-        </button>
-        <button onclick="openAdminLogin()" class="bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-xl text-sm font-medium hover:bg-slate-50 transition">
-          Login Pengurus / Admin
-        </button>
+    </div>
+
+    <!-- Kotak Pintasan Halaman Page -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- 1. Akses Warga -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-[#1B4332] flex items-center justify-center font-bold">🏠</div>
+        <h3 class="font-heading font-bold text-base text-slate-900">Dashboard Warga</h3>
+        <p class="text-xs text-slate-500">Uji form pengajuan surat, review status surat, dan lihat alur kas.</p>
+        <a href="warga.html" class="block text-center w-full bg-[#1B4332] hover:bg-[#143326] text-white text-xs font-medium py-2.5 rounded-xl transition">
+          Buka wargapage.html →
+        </a>
+      </div>
+
+      <!-- 2. Akses Admin -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold">🛡️</div>
+        <h3 class="font-heading font-bold text-base text-slate-900">Dashboard Admin</h3>
+        <p class="text-xs text-slate-500">Uji verifikasi akun warga (cek KTP/KK), setujui surat, dan input iuran.</p>
+        <a href="admin.html" class="block text-center w-full bg-blue-700 hover:bg-blue-800 text-white text-xs font-medium py-2.5 rounded-xl transition">
+          Buka adminpage.html →
+        </a>
+      </div>
+
+      <!-- 3. Akses Super Admin -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-700 flex items-center justify-center font-bold">⚡</div>
+        <h3 class="font-heading font-bold text-base text-slate-900">Dashboard Super Admin</h3>
+        <p class="text-xs text-slate-500">Uji edit kop surat, templat, redaksi, dan ubah role user/admin.</p>
+        <a href="superadmin.html" class="block text-center w-full bg-rose-700 hover:bg-rose-800 text-white text-xs font-medium py-2.5 rounded-xl transition">
+          Buka superadminpage.html →
+        </a>
       </div>
     </div>
-  </main>
 
-  <!-- Modal Pilihan Warga -->
-  <div id="choiceModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 text-center">
-      <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Portal Warga RT</h3>
-      <p class="text-xs text-slate-500 mb-6">Silakan pilih status akun Anda.</p>
-      <div class="space-y-3">
-        <button onclick="switchToLogin()" class="w-full bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium py-3 rounded-xl transition">
-          Sudah Punya Akun (Masuk)
-        </button>
-        <button onclick="switchToRegister()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium py-3 rounded-xl transition">
-          Belum Punya Akun (Daftar Mandiri)
-        </button>
+    <!-- Kotak Form Pendaftaran Mandiri Warga (Terhubung Supabase & Storage) -->
+    <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200/80 shadow-xs max-w-2xl">
+      <div class="mb-4">
+        <h2 class="font-heading font-bold text-lg text-slate-900">Form Pendaftaran Mandiri Warga</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Menguji database Supabase, trigger profil, dan upload KTP/KK ke Storage bucket `dokumen-warga`[span_2](start_span)[span_2](end_span)[span_3](start_span)[span_3](end_span).</p>
       </div>
-      <button onclick="closeModals()" class="mt-4 text-xs text-slate-400 hover:text-slate-600">Batal</button>
-    </div>
-  </div>
 
-  <!-- Modal Login Warga -->
-  <div id="loginModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="font-heading font-bold text-base text-slate-900">Masuk Portal Warga</h2>
-        <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">✕</button>
-      </div>
-      <form id="loginForm" class="space-y-3">
-        <div>
-          <label class="text-xs font-medium text-slate-600">Email</label>
-          <input type="email" id="loginEmail" required placeholder="warga@smartrt.id" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-600">Kata Sandi</label>
-          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
-        </div>
-        <p id="loginError" class="text-xs text-rose-600 hidden"></p>
-        <button type="submit" class="w-full bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium py-2.5 rounded-xl transition">
-          Masuk Sekarang
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Login Pengurus -->
-  <div id="adminLoginModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100">
-      <div class="flex justify-between items-center mb-2">
-        <h2 class="font-heading font-bold text-base text-slate-900">Login Pengurus / Admin</h2>
-        <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">✕</button>
-      </div>
-      <p class="text-[11px] text-slate-500 mb-4">Masuk menggunakan akun khusus pengurus.</p>
-      <form id="adminLoginForm" class="space-y-3">
-        <div>
-          <label class="text-xs font-medium text-slate-600">Email Pengurus</label>
-          <input type="email" id="adminEmail" required placeholder="pengurus@smartrt.id" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-600">Kata Sandi</label>
-          <input type="password" id="adminPassword" required placeholder="••••••••" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
-        </div>
-        <p id="adminLoginError" class="text-xs text-rose-600 hidden"></p>
-        <button type="submit" class="w-full bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium py-2.5 rounded-xl transition">
-          Akses Dashboard Pengurus
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Pendaftaran Mandiri Warga (+ Upload KTP & KK) -->
-  <div id="registerModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
-      <div class="flex justify-between items-center mb-3">
-        <h2 class="font-heading font-bold text-base text-slate-900">Pendaftaran Mandiri Warga</h2>
-        <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">✕</button>
-      </div>
-      <p class="text-[11px] text-amber-700 bg-amber-50 p-2.5 rounded-lg mb-3">
-        Wajib upload foto KTP & KK untuk verifikasi oleh pengurus RT.
-      </p>
       <form id="registerForm" class="space-y-3">
         <div>
-          <label class="text-xs font-medium text-slate-600">Nama Lengkap</label>
-          <input type="text" id="regNama" required placeholder="Sesuai KTP" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+          <label class="text-xs font-medium text-slate-600">Nama Lengkap Sesuai KTP</label>
+          <input type="text" id="regNama" required placeholder="Contoh: Dendi Agam Saputra" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="text-xs font-medium text-slate-600">NIK</label>
-            <input type="text" id="regNik" required placeholder="16 digit NIK" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+            <label class="text-xs font-medium text-slate-600">NIK (16 Digit)</label>
+            <input type="text" id="regNik" required placeholder="327701..." class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
           </div>
           <div>
-            <label class="text-xs font-medium text-slate-600">No. KK</label>
-            <input type="text" id="regNoKk" required placeholder="16 digit KK" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+            <label class="text-xs font-medium text-slate-600">No. KK (16 Digit)</label>
+            <input type="text" id="regNoKk" required placeholder="327700..." class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
           </div>
         </div>
-        <div>
-          <label class="text-xs font-medium text-slate-600">Nomor Rumah (Blok/No)</label>
-          <input type="text" id="regNoRumah" required placeholder="Blok B2 No. 12" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-600">Email Aktif</label>
-          <input type="email" id="regEmail" required placeholder="warga@email.com" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs font-medium text-slate-600">Nomor Rumah (Blok/No)</label>
+            <input type="text" id="regNoRumah" required placeholder="Blok C No. 5" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-600">Email Akun Warga</label>
+            <input type="email" id="regEmail" required placeholder="warga@gmail.com" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+          </div>
         </div>
         <div>
           <label class="text-xs font-medium text-slate-600">Kata Sandi</label>
-          <input type="password" id="regPassword" required placeholder="Min. 6 karakter" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+          <input type="password" id="regPassword" required placeholder="Minimal 6 karakter" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
         </div>
-        <div class="grid grid-cols-2 gap-3 pt-2">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
           <div>
-            <label class="text-xs font-medium text-slate-600 block mb-1">Foto KTP</label>
+            <label class="text-xs font-medium text-slate-600 block mb-1">Upload Foto KTP</label>
             <input type="file" id="fileKtp" accept="image/*" required class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-[#1B4332]" />
           </div>
           <div>
-            <label class="text-xs font-medium text-slate-600 block mb-1">Foto KK</label>
+            <label class="text-xs font-medium text-slate-600 block mb-1">Upload Foto KK</label>
             <input type="file" id="fileKk" accept="image/*" required class="text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-[#1B4332]" />
           </div>
         </div>
-        <p id="regError" class="text-xs text-rose-600 hidden"></p>
-        <button type="submit" id="btnDaftar" class="w-full bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium py-2.5 rounded-xl transition mt-2">
-          Daftar Sekarang
+        <p id="regError" class="text-xs text-rose-600 hidden pt-1"></p>
+        <button type="submit" id="btnDaftar" class="w-full bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium py-2.5 rounded-xl transition mt-3">
+          Daftar Warga Sekarang (Kirim ke Supabase)
         </button>
       </form>
     </div>
-  </div>
+  </main>
 
   <footer class="border-t border-slate-200/70 bg-white py-6 text-center text-xs text-slate-400">
-    © 2026 Smart RT — Sistem Informasi Lingkungan Terpadu
+    © 2026 Smart RT — Mode Uji Coba Tanpa Login
   </footer>
 
   <script type="module">
     import { supabase } from './js/config.js';
 
-    window.openPortalChoice = () => { closeModals(); document.getElementById('choiceModal').classList.remove('hidden'); };
-    window.openAdminLogin = () => { closeModals(); document.getElementById('adminLoginModal').classList.remove('hidden'); };
-    window.switchToLogin = () => { closeModals(); document.getElementById('loginModal').classList.remove('hidden'); };
-    window.switchToRegister = () => { closeModals(); document.getElementById('registerModal').classList.remove('hidden'); };
-    window.closeModals = () => {
-      document.getElementById('choiceModal').classList.add('hidden');
-      document.getElementById('loginModal').classList.add('hidden');
-      document.getElementById('adminLoginModal').classList.add('hidden');
-      document.getElementById('registerModal').classList.add('hidden');
-    };
-
-    // Fungsi Pengarah Sesuai Role
-    async function redirectBasedOnRole(userId) {
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', userId).single();
-      if (profile?.role === 'superadmin') {
-        window.location.href = 'superadmin.html';
-      } else if (profile?.role === 'admin') {
-        window.location.href = 'admin.html';
-      } else {
-        window.location.href = 'warga.html';
-      }
-    }
-
-    // Login Warga
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        document.getElementById('loginError').textContent = 'Email atau kata sandi salah.';
-        document.getElementById('loginError').classList.remove('hidden');
-      } else {
-        await redirectBasedOnRole(data.user.id);
-      }
-    });
-
-    // Login Pengurus
-    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('adminEmail').value;
-      const password = document.getElementById('adminPassword').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        document.getElementById('adminLoginError').textContent = 'Akses ditolak: Kredensial pengurus salah.';
-        document.getElementById('adminLoginError').classList.remove('hidden');
-      } else {
-        await redirectBasedOnRole(data.user.id);
-      }
-    });
-
-    // Pendaftaran Mandiri Warga + Storage Upload KTP/KK
+    // Script Uji Pendaftaran Mandiri Warga langsung terhubung Supabase & Storage
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btnDaftar');
-      btn.textContent = 'Mengunggah & Mendaftar...';
+      const errEl = document.getElementById('regError');
+      errEl.classList.add('hidden');
+      
+      btn.textContent = 'Mengunggah Dokumen & Mendaftar...';
       btn.disabled = true;
 
       const nama = document.getElementById('regNama').value;
@@ -251,23 +153,26 @@
       const fileKk = document.getElementById('fileKk').files[0];
 
       try {
+        // 1. Upload KTP ke Supabase Storage bucket 'dokumen-warga'
         const fileExt1 = fileKtp.name.split('.').pop();
         const fileName1 = `${Date.now()}_ktp.${fileExt1}`;
         const { error: errKtp } = await supabase.storage.from('dokumen-warga').upload(fileName1, fileKtp);
         if (errKtp) throw errKtp;
 
+        // 2. Upload KK ke Supabase Storage bucket 'dokumen-warga'
         const fileExt2 = fileKk.name.split('.').pop();
         const fileName2 = `${Date.now()}_kk.${fileExt2}`;
         const { error: errKk } = await supabase.storage.from('dokumen-warga').upload(fileName2, fileKk);
         if (errKk) throw errKk;
 
+        // 3. Daftarkan Auth user dengan metadata agar trigger SQL otomatis memasukkannya ke tabel 'profiles'
         const { error: signUpErr } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
               nama_lengkap: nama,
-              nik,
+              nik: nik,
               no_kk: noKk,
               no_rumah: noRumah,
               rt: '04',
@@ -279,13 +184,13 @@
 
         if (signUpErr) throw signUpErr;
 
-        alert('Pendaftaran berhasil! Akun Anda sedang menunggu verifikasi dari Pengurus RT.');
-        switchToLogin();
+        alert('Pendaftaran warga berhasil! Data dan dokumen KTP/KK telah masuk ke Supabase. Status akun warga otomatis bernilai "pending". Silakan cek di Halaman Admin untuk meng-acc/verifikasi.');
+        document.getElementById('registerForm').reset();
       } catch (err) {
-        document.getElementById('regError').textContent = err.message;
-        document.getElementById('regError').classList.remove('hidden');
+        errEl.textContent = 'Gagal mendaftar: ' + err.message;
+        errEl.classList.remove('hidden');
       } finally {
-        btn.textContent = 'Daftar Sekarang';
+        btn.textContent = 'Daftar Warga Sekarang (Kirim ke Supabase)';
         btn.disabled = false;
       }
     });
