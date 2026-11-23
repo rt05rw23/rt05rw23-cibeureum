@@ -5,14 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Pengurus - RT 05 / RW 23</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
   <!-- Form Login Pengurus -->
   <div id="login-box" class="max-w-md mx-auto pt-20 px-4">
     <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold mb-4">05</div>
       <h2 class="text-xl font-bold text-slate-900 mb-1">Login Pengurus RT 05</h2>
-      <p class="text-xs text-slate-500 mb-6">Masuk untuk mengelola informasi & administrasi warga</p>
+      <p class="text-xs text-slate-500 mb-6">Masuk untuk mengelola surat pengantar, pengumuman & kas</p>
       <form id="form-login" class="space-y-4">
         <input type="email" id="email" required placeholder="Email Pengurus" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
         <input type="password" id="password" required placeholder="Password" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
@@ -23,43 +28,100 @@
   </div>
 
   <!-- Area Dashboard Admin -->
-  <div id="dashboard-box" class="hidden max-w-4xl mx-auto py-10 px-4 space-y-8">
-    <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-      <h1 class="font-bold text-blue-700 text-sm sm:text-base">Dashboard Pengurus RT 05 / RW 23</h1>
-      <button id="btn-logout" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-3.5 py-2 rounded-lg transition">Keluar</button>
+  <div id="dashboard-box" class="hidden max-w-6xl mx-auto py-8 px-4 space-y-8">
+    
+    <!-- Header Dashboard -->
+    <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm">05</div>
+        <div>
+          <h1 class="font-bold text-slate-900 text-sm sm:text-base">Dashboard Pengurus RT 05 / RW 23</h1>
+          <p class="text-xs text-slate-500">Kelurahan Cibeureum, Kota Cimahi</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3.5 py-2 rounded-lg transition">Lihat Web</a>
+        <button id="btn-logout" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-3.5 py-2 rounded-lg transition">Keluar</button>
+      </div>
     </div>
 
+    <!-- BAGIAN 1: KELOLA & CETAK SURAT PENGANTAR -->
+    <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Kelola Pengajuan Surat Warga</h2>
+          <p class="text-xs text-slate-500">Ubah status pengajuan, kirim notifikasi WA, atau cetak surat pengantar</p>
+        </div>
+        <button onclick="loadAdminSurat()" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold px-3 py-1.5 rounded-lg">Muat Ulang</button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+              <th class="py-3 px-3">Pemohon & NIK</th>
+              <th class="py-3 px-3">Jenis Surat & Keperluan</th>
+              <th class="py-3 px-3">Status</th>
+              <th class="py-3 px-3 text-right">Aksi Pengurus</th>
+            </tr>
+          </thead>
+          <tbody id="admin-tabel-surat" class="divide-y divide-slate-100">
+            <tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">Memuat data surat...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BAGIAN 2: INPUT PENGUMUMAN & KAS RT -->
     <div class="grid md:grid-cols-2 gap-6">
       <!-- Tambah Pengumuman -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="font-bold mb-4 text-slate-900">Buat Pengumuman Baru</h3>
-        <form id="form-pengumuman" class="space-y-3">
-          <input type="text" id="judul" required placeholder="Judul Pengumuman" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
-          <select id="kategori" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white outline-none">
-            <option value="Kerja Bakti">Kerja Bakti</option>
-            <option value="Rapat Warga">Rapat Warga</option>
-            <option value="Keamanan">Keamanan</option>
-            <option value="Umum">Umum</option>
-          </select>
-          <textarea id="isi" rows="3" required placeholder="Isi pengumuman..." class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600"></textarea>
-          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl transition">Terbitkan Pengumuman</button>
-        </form>
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <h3 class="font-bold mb-4 text-slate-900">Buat Pengumuman Baru</h3>
+          <form id="form-pengumuman" class="space-y-3">
+            <input type="text" id="judul" required placeholder="Judul Pengumuman" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
+            <select id="kategori" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white outline-none">
+              <option value="Kerja Bakti">Kerja Bakti</option>
+              <option value="Rapat Warga">Rapat Warga</option>
+              <option value="Keamanan">Keamanan</option>
+              <option value="Bantuan Sosial">Bantuan Sosial</option>
+              <option value="Umum">Umum</option>
+            </select>
+            <textarea id="isi" rows="3" required placeholder="Isi pengumuman..." class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 rounded-xl transition">Terbitkan Pengumuman</button>
+          </form>
+        </div>
+
+        <!-- Daftar Pengumuman Aktif -->
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Pengumuman Terbaru</h4>
+          <div id="admin-list-pengumuman" class="space-y-2 text-xs"></div>
+        </div>
       </div>
 
       <!-- Catat Kas RT -->
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="font-bold mb-4 text-slate-900">Catat Transaksi Kas RT</h3>
-        <form id="form-kas" class="space-y-3">
-          <input type="text" id="ket_kas" required placeholder="Keterangan (Misal: Iuran Sampah)" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600">
-          <select id="jenis_kas" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white outline-none">
-            <option value="Masuk">Pemasukan (+)</option>
-            <option value="Keluar">Pengeluaran (-)</option>
-          </select>
-          <input type="number" id="nominal_kas" required placeholder="Nominal (Contoh: 150000)" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600">
-          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 rounded-xl transition">Simpan ke Buku Kas</button>
-        </form>
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <h3 class="font-bold mb-4 text-slate-900">Catat Transaksi Kas RT</h3>
+          <form id="form-kas" class="space-y-3">
+            <input type="text" id="ket_kas" required placeholder="Keterangan (Misal: Iuran Sampah)" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600">
+            <select id="jenis_kas" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl bg-white outline-none">
+              <option value="Masuk">Pemasukan (+)</option>
+              <option value="Keluar">Pengeluaran (-)</option>
+            </select>
+            <input type="number" id="nominal_kas" required placeholder="Nominal (Contoh: 150000)" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-emerald-600">
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold py-2.5 rounded-xl transition">Simpan ke Buku Kas</button>
+          </form>
+        </div>
+
+        <!-- Daftar Kas Terakhir -->
+        <div class="mt-6 pt-5 border-t border-slate-100">
+          <h4 class="text-xs font-bold text-slate-500 uppercase mb-3">Transaksi Terakhir</h4>
+          <div id="admin-list-kas" class="space-y-2 text-xs"></div>
+        </div>
       </div>
     </div>
+
   </div>
 
   <script type="module">
@@ -73,20 +135,20 @@
     if (session) {
       loginBox.classList.add('hidden');
       dashBox.classList.remove('hidden');
+      loadAdminSurat();
+      loadAdminPengumuman();
+      loadAdminKas();
     }
 
-    // Proses Login
+    // Login
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        alert('Login gagal: ' + error.message);
-      } else {
-        location.reload();
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      });
+      if (error) alert('Login gagal: ' + error.message);
+      else location.reload();
     });
 
     // Logout
@@ -95,37 +157,145 @@
       location.reload();
     });
 
-    // Simpan Pengumuman
+    // Format Nomor WA ke 62...
+    function formatWA(nomor) {
+      let clean = nomor.replace(/\D/g, '');
+      if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+      return clean;
+    }
+
+    // 1. MUAT DAFTAR PENGAJUAN SURAT
+    window.loadAdminSurat = async function() {
+      const tbody = document.getElementById('admin-tabel-surat');
+      const { data, error } = await supabase
+        .from('pengajuan_surat')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">Belum ada pengajuan surat dari warga.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => {
+        const waNumber = formatWA(item.no_wa || '');
+        const pesanWA = encodeURIComponent(
+          `Halo Bapak/Ibu *${item.nama_pemohon}*,\n\nPengajuan *${item.jenis_surat}* Anda di RT 05 / RW 23 Kelurahan Cibeureum telah berstatus: *${item.status}*.\n\nSilakan menghubungi pengurus RT untuk pengambilan/tanda tangan. Terima kasih.`
+        );
+
+        return `
+          <tr class="hover:bg-slate-50/70">
+            <td class="py-3.5 px-3 align-top">
+              <div class="font-bold text-slate-900">${item.nama_pemohon}</div>
+              <div class="text-xs text-slate-500">NIK: ${item.nik}</div>
+              <div class="text-xs text-blue-600 mt-0.5">WA: ${item.no_wa}</div>
+            </td>
+            <td class="py-3.5 px-3 align-top">
+              <span class="inline-block font-semibold text-slate-800">${item.jenis_surat}</span>
+              <p class="text-xs text-slate-500 mt-0.5">${item.keperluan || '-'}</p>
+            </td>
+            <td class="py-3.5 px-3 align-top">
+              <select onchange="ubahStatusSurat('${item.id}', this.value)" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Menunggu Verifikasi" ${item.status === 'Menunggu Verifikasi' ? 'selected' : ''}>Menunggu Verifikasi</option>
+                <option value="Diproses" ${item.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
+                <option value="Selesai" ${item.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
+              </select>
+            </td>
+            <td class="py-3.5 px-3 align-top text-right space-x-1 whitespace-nowrap">
+              <a href="cetak-surat.html?id=${item.id}" target="_blank" class="inline-block text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg transition">
+                Cetak Surat
+              </a>
+              <a href="https://wa.me/${waNumber}?text=${pesanWA}" target="_blank" class="inline-block text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1.5 rounded-lg transition">
+                Info WA
+              </a>
+              <button onclick="hapusData('pengajuan_surat', '${item.id}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-2.5 py-1.5 rounded-lg transition">
+                Hapus
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    // Ubah Status Surat
+    window.ubahStatusSurat = async function(id, statusBaru) {
+      const { error } = await supabase
+        .from('pengajuan_surat')
+        .update({ status: statusBaru })
+        .eq('id', id);
+
+      if (error) alert('Gagal mengubah status: ' + error.message);
+      else loadAdminSurat();
+    };
+
+    // Hapus Baris Data Umum
+    window.hapusData = async function(tabel, id) {
+      if (!confirm('Yakin ingin menghapus data ini?')) return;
+      const { error } = await supabase.from(tabel).delete().eq('id', id);
+      if (error) {
+        alert('Gagal menghapus: ' + error.message);
+      } else {
+        if (tabel === 'pengajuan_surat') loadAdminSurat();
+        if (tabel === 'pengumuman') loadAdminPengumuman();
+        if (tabel === 'kas_rt') loadAdminKas();
+      }
+    };
+
+    // 2. PENGUMUMAN
     document.getElementById('form-pengumuman').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const judul = document.getElementById('judul').value;
-      const kategori = document.getElementById('kategori').value;
-      const isi = document.getElementById('isi').value;
-
-      const { error } = await supabase.from('pengumuman').insert([{ judul, kategori, isi }]);
-      if (error) {
-        alert('Gagal: ' + error.message);
-      } else {
-        alert('Pengumuman berhasil diterbitkan!');
+      const { error } = await supabase.from('pengumuman').insert([{
+        judul: document.getElementById('judul').value,
+        kategori: document.getElementById('kategori').value,
+        isi: document.getElementById('isi').value
+      }]);
+      if (error) alert('Gagal: ' + error.message);
+      else {
+        alert('Pengumuman diterbitkan!');
         e.target.reset();
+        loadAdminPengumuman();
       }
     });
 
-    // Simpan Kas
+    async function loadAdminPengumuman() {
+      const box = document.getElementById('admin-list-pengumuman');
+      const { data } = await supabase.from('pengumuman').select('id, judul, tanggal').order('created_at', { ascending: false }).limit(5);
+      if (!data || data.length === 0) { box.innerHTML = '<p class="text-slate-400">Kosong</p>'; return; }
+      box.innerHTML = data.map(p => `
+        <div class="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-lg">
+          <span class="truncate pr-2 font-medium text-slate-700">${p.judul}</span>
+          <button onclick="hapusData('pengumuman', '${p.id}')" class="text-rose-600 hover:underline shrink-0">Hapus</button>
+        </div>
+      `).join('');
+    }
+
+    // 3. KAS RT
     document.getElementById('form-kas').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const keterangan = document.getElementById('ket_kas').value;
-      const jenis = document.getElementById('jenis_kas').value;
-      const nominal = document.getElementById('nominal_kas').value;
-
-      const { error } = await supabase.from('kas_rt').insert([{ keterangan, jenis, nominal }]);
-      if (error) {
-        alert('Gagal: ' + error.message);
-      } else {
-        alert('Data kas berhasil disimpan!');
+      const { error } = await supabase.from('kas_rt').insert([{
+        keterangan: document.getElementById('ket_kas').value,
+        jenis: document.getElementById('jenis_kas').value,
+        nominal: document.getElementById('nominal_kas').value
+      }]);
+      if (error) alert('Gagal: ' + error.message);
+      else {
+        alert('Data kas tersimpan!');
         e.target.reset();
+        loadAdminKas();
       }
     });
+
+    async function loadAdminKas() {
+      const box = document.getElementById('admin-list-kas');
+      const { data } = await supabase.from('kas_rt').select('id, keterangan, jenis, nominal').order('tanggal', { ascending: false }).limit(5);
+      if (!data || data.length === 0) { box.innerHTML = '<p class="text-slate-400">Kosong</p>'; return; }
+      box.innerHTML = data.map(k => `
+        <div class="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-lg">
+          <span class="truncate pr-2 text-slate-700">${k.keterangan} (${k.jenis === 'Masuk' ? '+' : '-'}Rp${Number(k.nominal).toLocaleString('id-ID')})</span>
+          <button onclick="hapusData('kas_rt', '${k.id}')" class="text-rose-600 hover:underline shrink-0">Hapus</button>
+        </div>
+      `).join('');
+    }
   </script>
 </body>
 </html>
