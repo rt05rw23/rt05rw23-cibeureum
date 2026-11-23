@@ -102,7 +102,7 @@
         <h2 class="font-heading font-bold text-base text-slate-900">Login Pengurus / Admin</h2>
         <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">✕</button>
       </div>
-      <p class="text-[11px] text-slate-500 mb-4">Masuk menggunakan akun khusus yang didaftarkan Super Admin.</p>
+      <p class="text-[11px] text-slate-500 mb-4">Masuk menggunakan akun khusus pengurus.</p>
       <form id="adminLoginForm" class="space-y-3">
         <div>
           <label class="text-xs font-medium text-slate-600">Email Pengurus</label>
@@ -193,28 +193,47 @@
       document.getElementById('registerModal').classList.add('hidden');
     };
 
+    // Fungsi Pengarah Sesuai Role
+    async function redirectBasedOnRole(userId) {
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', userId).single();
+      if (profile?.role === 'superadmin') {
+        window.location.href = 'superadmin.html';
+      } else if (profile?.role === 'admin') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'warga.html';
+      }
+    }
+
+    // Login Warga
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         document.getElementById('loginError').textContent = 'Email atau kata sandi salah.';
         document.getElementById('loginError').classList.remove('hidden');
-      } else { window.location.href = 'dashboard.html'; }
+      } else {
+        await redirectBasedOnRole(data.user.id);
+      }
     });
 
+    // Login Pengurus
     document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('adminEmail').value;
       const password = document.getElementById('adminPassword').value;
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         document.getElementById('adminLoginError').textContent = 'Akses ditolak: Kredensial pengurus salah.';
         document.getElementById('adminLoginError').classList.remove('hidden');
-      } else { window.location.href = 'dashboard.html'; }
+      } else {
+        await redirectBasedOnRole(data.user.id);
+      }
     });
 
+    // Pendaftaran Mandiri Warga + Storage Upload KTP/KK
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btnDaftar');
@@ -234,16 +253,13 @@
       try {
         const fileExt1 = fileKtp.name.split('.').pop();
         const fileName1 = `${Date.now()}_ktp.${fileExt1}`;
-        const { data: uploadKtp, error: errKtp } = await supabase.storage.from('dokumen-warga').upload(fileName1, fileKtp);
+        const { error: errKtp } = await supabase.storage.from('dokumen-warga').upload(fileName1, fileKtp);
         if (errKtp) throw errKtp;
 
         const fileExt2 = fileKk.name.split('.').pop();
         const fileName2 = `${Date.now()}_kk.${fileExt2}`;
-        const { data: uploadKk, error: errKk } = await supabase.storage.from('dokumen-warga').upload(fileName2, fileKk);
+        const { error: errKk } = await supabase.storage.from('dokumen-warga').upload(fileName2, fileKk);
         if (errKk) throw errKk;
-
-        const { data: urlKtpData } = supabase.storage.from('dokumen-warga').getPublicUrl(fileName1);
-        const { data: urlKkData } = supabase.storage.from('dokumen-warga').getPublicUrl(fileName2);
 
         const { error: signUpErr } = await supabase.auth.signUp({
           email,
@@ -255,7 +271,7 @@
               no_kk: noKk,
               no_rumah: noRumah,
               rt: '04',
-              url_ktp: fileName1, // Simpan path storage
+              url_ktp: fileName1,
               url_kk: fileName2
             }
           }
