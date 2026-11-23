@@ -20,9 +20,16 @@
         <div class="w-8 h-8 rounded-lg bg-[#1B4332] text-white flex items-center justify-center font-heading font-bold text-sm">RT</div>
         <span class="font-heading font-bold text-slate-900">Smart RT</span>
       </div>
-      <button onclick="openPortalChoice()" class="bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium px-5 py-2 rounded-full transition">
-        Masuk Portal
-      </button>
+      <div class="flex items-center gap-3">
+        <!-- Tombol Khusus Pengurus -->
+        <button onclick="openAdminLogin()" class="text-xs font-semibold text-[#1B4332] hover:underline">
+          Akses Pengurus
+        </button>
+        <!-- Tombol Utama Portal Warga -->
+        <button onclick="openPortalChoice()" class="bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium px-5 py-2 rounded-full transition">
+          Masuk Portal Warga
+        </button>
+      </div>
     </div>
   </header>
 
@@ -38,35 +45,40 @@
       <p class="text-slate-500 text-base leading-relaxed mb-8">
         Pengajuan surat pengantar mandiri, transparansi kas real-time, serta sistem manajemen warga yang aman dan terstruktur.
       </p>
-      <button onclick="openPortalChoice()" class="bg-[#1B4332] text-white px-6 py-3 rounded-xl text-sm font-medium hover:bg-[#143326] transition shadow-sm">
-        Mulai Akses / Daftar Warga →
-      </button>
+      <div class="flex flex-wrap gap-3">
+        <button onclick="openPortalChoice()" class="bg-[#1B4332] text-white px-6 py-3 rounded-xl text-sm font-medium hover:bg-[#143326] transition shadow-sm">
+          Mulai Warga Portal →
+        </button>
+        <button onclick="openAdminLogin()" class="bg-white border border-slate-200 text-slate-700 px-6 py-3 rounded-xl text-sm font-medium hover:bg-slate-50 transition">
+          Login Pengurus / Admin
+        </button>
+      </div>
     </div>
   </main>
 
-  <!-- MODAL 1: PILIHAN (SUDAH / BELUM PUNYA AKUN) -->
+  <!-- MODAL 1: PILIHAN PORTAL WARGA (SUDAH / BELUM PUNYA AKUN) -->
   <div id="choiceModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100 text-center">
-      <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Selamat Datang di Smart RT</h3>
-      <p class="text-xs text-slate-500 mb-6">Silakan pilih status akun Anda untuk melanjutkan ke portal.</p>
+      <h3 class="font-heading font-bold text-lg text-slate-900 mb-2">Portal Warga RT</h3>
+      <p class="text-xs text-slate-500 mb-6">Silakan pilih status akun Anda sebagai warga lingkungan.</p>
       
       <div class="space-y-3">
         <button onclick="switchToLogin()" class="w-full bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium py-3 rounded-xl transition">
-          Saya Sudah Punya Akun (Masuk)
+          Sudah Punya Akun (Masuk)
         </button>
         <button onclick="switchToRegister()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium py-3 rounded-xl transition">
-          Belum Punya Akun (Daftar Mandiri Warga)
+          Belum Punya Akun (Daftar Mandiri)
         </button>
       </div>
       <button onclick="closeModals()" class="mt-4 text-xs text-slate-400 hover:text-slate-600">Batal</button>
     </div>
   </div>
 
-  <!-- MODAL 2: FORM LOGIN -->
+  <!-- MODAL 2: FORM LOGIN (UMUM / WARGA) -->
   <div id="loginModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="font-heading font-bold text-base text-slate-900">Masuk ke Portal Warga</h2>
+        <h2 class="font-heading font-bold text-base text-slate-900">Masuk Portal Warga</h2>
         <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">✕</button>
       </div>
       <form id="loginForm" class="space-y-3">
@@ -89,7 +101,34 @@
     </div>
   </div>
 
-  <!-- MODAL 3: FORM PENDAFTARAN MANDIRI (WARGA) -->
+  <!-- MODAL 3: FORM LOGIN KHUSUS PENGURUS / ADMIN -->
+  <div id="adminLoginModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="font-heading font-bold text-base text-slate-900">Login Pengurus / Admin</h2>
+        <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+      <p class="text-[11px] text-slate-500 mb-4">
+        Masuk menggunakan akun khusus pengurus yang telah didaftarkan oleh Super Admin.
+      </p>
+      <form id="adminLoginForm" class="space-y-3">
+        <div>
+          <label class="text-xs font-medium text-slate-600">Email Pengurus</label>
+          <input type="email" id="adminEmail" required placeholder="pengurus@smartrt.id" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-slate-600">Kata Sandi</label>
+          <input type="password" id="adminPassword" required placeholder="••••••••" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+        </div>
+        <p id="adminLoginError" class="text-xs text-rose-600 hidden"></p>
+        <button type="submit" class="w-full bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium py-2.5 rounded-xl transition">
+          Akses Dashboard Pengurus
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 4: FORM PENDAFTARAN MANDIRI (WARGA) -->
   <div id="registerModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-xl border border-slate-100">
       <div class="flex justify-between items-center mb-3">
@@ -139,6 +178,11 @@
       document.getElementById('choiceModal').classList.remove('hidden');
     };
 
+    window.openAdminLogin = () => {
+      closeModals();
+      document.getElementById('adminLoginModal').classList.remove('hidden');
+    };
+
     window.switchToLogin = () => {
       closeModals();
       document.getElementById('loginModal').classList.remove('hidden');
@@ -152,10 +196,11 @@
     window.closeModals = () => {
       document.getElementById('choiceModal').classList.add('hidden');
       document.getElementById('loginModal').classList.add('hidden');
+      document.getElementById('adminLoginModal').classList.add('hidden');
       document.getElementById('registerModal').classList.add('hidden');
     };
 
-    // Logika Login
+    // Logika Login Warga
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value;
@@ -171,6 +216,22 @@
       }
     });
 
+    // Logika Login Khusus Pengurus / Admin
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('adminEmail').value;
+      const password = document.getElementById('adminPassword').value;
+      const errEl = document.getElementById('adminLoginError');
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        errEl.textContent = 'Akses ditolak: Email atau kata sandi pengurus salah.';
+        errEl.classList.remove('hidden');
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    });
+
     // Logika Pendaftaran Mandiri Warga
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -180,8 +241,6 @@
       const password = document.getElementById('regPassword').value;
       const errEl = document.getElementById('regError');
 
-      // Mendaftarkan user ke Supabase Auth dengan menyertakan metadata
-      // Trigger SQL di atas akan otomatis memasukkannya ke tabel profiles dengan role 'warga'
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -198,7 +257,7 @@
         errEl.textContent = error.message;
         errEl.classList.remove('hidden');
       } else {
-        alert('Pendaftaran berhasil! Silakan masuk menggunakan email dan kata sandi Anda.');
+        alert('Pendaftaran warga berhasil! Silakan masuk.');
         switchToLogin();
       }
     });
