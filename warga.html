@@ -20,7 +20,7 @@
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-[#1B4332] text-white flex items-center justify-center font-heading font-bold text-sm">RT</div>
         <div>
-          <span id="userName" class="font-heading font-bold text-sm text-slate-900 block leading-none">Warga Smart RT</span>
+          <span class="font-heading font-bold text-sm text-slate-900 block leading-none">Warga Smart RT</span>
           <span class="text-[11px] text-[#1B4332] font-medium uppercase tracking-wider">Dashboard Warga</span>
         </div>
       </div>
@@ -151,7 +151,6 @@
   <script type="module">
     import { supabase } from './js/config.js';
 
-    // Ambil data warga dari session / localStorage atau ambil user pertama untuk mode test
     async function initWarga() {
       // 1. Muat Saldo Kas & Alur Kas Real-Time
       const { data: kasList } = await supabase.from('kas_rt').select('*').order('created_at', { ascending: false });
@@ -164,7 +163,6 @@
       }
       document.getElementById('wargaSaldoKas').textContent = `Rp ${totalSaldo.toLocaleString('id-ID')}`;
 
-      // Tampilkan list kas/iuran lengkap dengan bukti kuitansi
       const containerKas = document.getElementById('listAlurKasWarga');
       if (kasList && kasList.length > 0) {
         containerKas.innerHTML = kasList.slice(0, 5).map(k => `
@@ -236,7 +234,7 @@
       btn.disabled = false;
     });
 
-    // Fungsi Cetak Surat Bersih Tanpa Error String
+    // Fungsi Cetak Surat Bersih & Aman
     window.printSurat = async (id) => {
       const { data: s } = await supabase.from('surat_pengantar').select('*').eq('id', id).single();
       const { data: cfg } = await supabase.from('pengaturan_surat').select('*').single();
