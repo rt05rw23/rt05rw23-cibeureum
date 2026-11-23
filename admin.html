@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Pengurus — Smart RT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #FAFAFA; color: #1E293B; }
+    h1, h2, h3, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <header class="bg-white border-b border-slate-200/85 sticky top-0 z-30">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-[#1B4332] text-white flex items-center justify-center font-heading font-bold text-sm">RT</div>
+        <div>
+          <span id="adminName" class="font-heading font-bold text-sm text-slate-900 block leading-none">Memuat...</span>
+          <span class="text-[11px] text-[#1B4332] font-medium uppercase tracking-wider">Dashboard Admin RT</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="superadmin.html" id="linkSuperAdmin" class="hidden text-xs font-semibold text-rose-700 bg-rose-50 px-3 py-1.5 rounded-lg border border-rose-100">Panel Super Admin</a>
+        <button id="logoutBtn" class="text-xs font-medium text-slate-500 hover:text-rose-600 px-3 py-1.5 rounded-lg border border-slate-200 transition">Keluar</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-8 space-y-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Verifikasi Warga & Cek KTP/KK -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
+        <div class="p-5 border-b border-slate-100">
+          <h3 class="font-heading font-bold text-sm text-slate-900">Verifikasi Akun Warga Baru (Pending)</h3>
+        </div>
+        <div id="listVerifikasiWarga" class="divide-y divide-slate-100 text-sm"></div>
+      </div>
+
+      <!-- Persetujuan Surat Pengantar -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
+        <div class="p-5 border-b border-slate-100">
+          <h3 class="font-heading font-bold text-sm text-slate-900">Persetujuan Surat Pengantar Warga</h3>
+        </div>
+        <div id="listSuratAdmin" class="divide-y divide-slate-100 text-sm"></div>
+      </div>
+    </div>
+
+    <!-- Input Buku Kas & Berbagai Kategori Iuran -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200/80">
+      <h3 class="font-heading font-bold text-sm text-slate-900 mb-4">Input Keuangan / Iuran Warga</h3>
+      <form id="formKas" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <input type="text" id="kJudul" required placeholder="Keterangan (mis: Iuran Sampah B2)" class="px-3 py-2.5 rounded-xl border border-slate-200 text-sm" />
+        <input type="number" id="kNominal" required placeholder="Nominal (Rp)" class="px-3 py-2.5 rounded-xl border border-slate-200 text-sm" />
+        <select id="kTipe" class="px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white">
+          <option value="pemasukan">Pemasukan (+)</option>
+          <option value="pengeluaran">Pengeluaran (-)</option>
+        </select>
+        <select id="kKategori" class="px-3 py-2.5 rounded-xl border border-slate-200 text-sm bg-white">
+          <option value="Iuran Kematian">Iuran Kematian</option>
+          <option value="Iuran Sampah">Iuran Sampah</option>
+          <option value="Iuran Keamanan">Iuran Keamanan</option>
+          <option value="Kas Umum">Kas Umum</option>
+          <option value="Pengeluaran Lain">Pengeluaran Lain</option>
+        </select>
+        <div class="sm:col-span-4">
+          <button type="submit" class="w-full bg-[#1B4332] text-white text-sm font-medium py-2.5 rounded-xl hover:bg-[#143326] transition">Simpan Transaksi Kas</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Modal Pratinjau KTP & KK -->
+  <div id="modalDokumen" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100 space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="font-heading font-bold text-base text-slate-900">Verifikasi Dokumen Warga</h3>
+        <button onclick="document.getElementById('modalDokumen').classList.add('hidden')" class="text-slate-400">✕</button>
+      </div>
+      <div class="grid grid-cols-2 gap-3 text-center">
+        <div><span class="text-xs text-slate-500 block mb-1">Foto KTP</span><img id="imgKtp" src="" class="w-full h-40 object-cover rounded-xl border" /></div>
+        <div><span class="text-xs text-slate-500 block mb-1">Foto KK</span><img id="imgKk" src="" class="w-full h-40 object-cover rounded-xl border" /></div>
+      </div>
+      <div id="modalAksiVerifikasi" class="pt-2"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './js/config.js';
+    import { checkAuthAndRedirect, setupLogout } from './js/app.js';
+
+    async function initAdmin() {
+      const auth = await checkAuthAndRedirect('admin');
+      if (!auth) return;
+      setupLogout();
+
+      document.getElementById('adminName').textContent = auth.profile.nama_lengkap;
+      if (auth.profile.role === 'superadmin') {
+        document.getElementById('linkSuperAdmin').classList.remove('hidden');
+      }
+
+      loadAdminData();
+    }
+
+    async function loadAdminData() {
+      const { data: pendings } = await supabase.from('profiles').select('*').eq('status_validasi', 'pending');
+      document.getElementById('listVerifikasiWarga').innerHTML = (pendings?.length ? pendings : []).map(p => `
+        <div class="p-4 flex items-center justify-between">
+          <div>
+            <div class="font-medium text-slate-900">${p.nama_lengkap}</div>
+            <div class="text-xs text-slate-500">Rumah: ${p.no_rumah} • NIK: ${p.nik}</div>
+          </div>
+          <button onclick="window.bukaModalDokumen('${p.id}', '${p.url_ktp}', '${p.url_kk}')" class="px-3 py-1.5 bg-[#1B4332] text-white rounded-lg text-xs">Cek Dokumen</button>
+        </div>
+      `).join('') || '<div class="p-5 text-xs text-slate-400">Tidak ada warga menunggu verifikasi.</div>';
+
+      const { data: surat } = await supabase.from('surat_pengantar').select('*').order('created_at', { ascending: false });
+      document.getElementById('listSuratAdmin').innerHTML = (surat || []).map(s => `
+        <div class="p-4 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-medium text-slate-900">${s.jenis_surat} — <span class="text-slate-500">${s.nama_pemohon}</span></div>
+            <div class="text-xs text-slate-500">${s.keperluan}</div>
+          </div>
+          ${s.status === 'menunggu' ? `
+            <div class="flex gap-1.5">
+              <button onclick="window.updateStatus('${s.id}', 'disetujui')" class="px-2.5 py-1 bg-[#1B4332] text-white rounded-lg text-xs">Setujui</button>
+              <button onclick="window.updateStatus('${s.id}', 'ditolak')" class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-lg text-xs">Tolak</button>
+            </div>
+          ` : `<span class="text-xs font-medium text-slate-400">${s.status}</span>`}
+        </div>
+      `).join('');
+    }
+
+    window.bukaModalDokumen = async (userId, ktpPath, kkPath) => {
+      const { data: urlKtp } = supabase.storage.from('dokumen-warga').getPublicUrl(ktpPath);
+      const { data: urlKk } = supabase.storage.from('dokumen-warga').getPublicUrl(kkPath);
+
+      document.getElementById('imgKtp').src = urlKtp.publicUrl;
+      document.getElementById('imgKk').src = urlKk.publicUrl;
+      document.getElementById('modalAksiVerifikasi').innerHTML = `
+        <div class="flex gap-3 pt-2">
+          <button onclick="window.verifikasi('${userId}', 'verified')" class="flex-1 bg-[#1B4332] text-white py-2 rounded-xl text-xs">Verifikasi (Setujui)</button>
+          <button onclick="window.verifikasi('${userId}', 'rejected')" class="flex-1 bg-rose-50 text-rose-600 py-2 rounded-xl text-xs">Tolak</button>
+        </div>
+      `;
+      document.getElementById('modalDokumen').classList.remove('hidden');
+    };
+
+    window.verifikasi = async (userId, status) => {
+      await supabase.from('profiles').update({ status_validasi: status }).eq('id', userId);
+      document.getElementById('modalDokumen').classList.add('hidden');
+      loadAdminData();
+      alert(`Warga berhasil di-${status}`);
+    };
+
+    window.updateStatus = async (id, status) => {
+      await supabase.from('surat_pengantar').update({ status }).eq('id', id);
+      loadAdminData();
+    };
+
+    document.getElementById('formKas').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await supabase.from('kas_rt').insert({
+        judul: document.getElementById('kJudul').value,
+        nominal: document.getElementById('kNominal').value,
+        tipe: document.getElementById('kTipe').value,
+        kategori: document.getElementById('kKategori').value
+      });
+      e.target.reset();
+      loadAdminData();
+      alert('Transaksi kas berhasil dicatat!');
+    });
+
+    initAdmin();
+  </script>
+</body>
+</html>
