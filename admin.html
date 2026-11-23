@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Pengurus - RT 05 / RW 23</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+  <!-- Form Login Pengurus -->
+  <div id="login-box" class="max-w-md mx-auto pt-20 px-4">
+    <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+      <h2 class="text-xl font-bold text-slate-900 mb-1">Login Pengurus RT 05</h2>
+      <p class="text-xs text-slate-500 mb-6">Masuk untuk mengelola informasi & administrasi warga</p>
+      <form id="form-login" class="space-y-4">
+        <input type="email" id="email" required placeholder="Email Pengurus" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl">
+        <input type="password" id="password" required placeholder="Password" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl">
+        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-xl hover:bg-blue-700">Masuk Dashboard</button>
+      </form>
+      <a href="index.html" class="block text-center text-xs text-slate-400 mt-4 hover:text-blue-600">&larr; Kembali ke Beranda Warga</a>
+    </div>
+  </div>
+
+  <!-- Area Dashboard Admin -->
+  <div id="dashboard-box" class="hidden max-w-4xl mx-auto py-10 px-4 space-y-8">
+    <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200">
+      <h1 class="font-bold text-blue-700">Dashboard Pengurus RT 05 / RW 23</h1>
+      <button id="btn-logout" class="text-xs bg-rose-50 text-rose-600 font-semibold px-3 py-1.5 rounded-lg">Keluar</button>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+      <!-- Tambah Pengumuman -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200">
+        <h3 class="font-bold mb-4">Buat Pengumuman Baru</h3>
+        <form id="form-pengumuman" class="space-y-3">
+          <input type="text" id="judul" required placeholder="Judul Pengumuman" class="w-full px-3 py-2 text-sm border rounded-xl">
+          <select id="kategori" class="w-full px-3 py-2 text-sm border rounded-xl bg-white">
+            <option value="Kerja Bakti">Kerja Bakti</option>
+            <option value="Rapat Warga">Rapat Warga</option>
+            <option value="Keamanan">Keamanan</option>
+            <option value="Umum">Umum</option>
+          </select>
+          <textarea id="isi" rows="3" required placeholder="Isi pengumuman..." class="w-full px-3 py-2 text-sm border rounded-xl"></textarea>
+          <button type="submit" class="w-full bg-blue-600 text-white text-sm font-semibold py-2.5 rounded-xl">Terbitkan Pengumuman</button>
+        </form>
+      </div>
+
+      <!-- Catat Kas RT -->
+      <div class="bg-white p-6 rounded-2xl border border-slate-200">
+        <h3 class="font-bold mb-4">Catat Transaksi Kas RT</h3>
+        <form id="form-kas" class="space-y-3">
+          <input type="text" id="ket_kas" required placeholder="Keterangan (Misal: Iuran Sampah Blok A)" class="w-full px-3 py-2 text-sm border rounded-xl">
+          <select id="jenis_kas" class="w-full px-3 py-2 text-sm border rounded-xl bg-white">
+            <option value="Masuk">Pemasukan (+)</option>
+            <option value="Keluar">Pengeluaran (-)</option>
+          </select>
+          <input type="number" id="nominal_kas" required placeholder="Nominal (Contoh: 150000)" class="w-full px-3 py-2 text-sm border rounded-xl">
+          <button type="submit" class="w-full bg-emerald-600 text-white text-sm font-semibold py-2.5 rounded-xl">Simpan ke Buku Kas</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from './js/config.js';
+
+    const loginBox = document.getElementById('login-box');
+    const dashBox = document.getElementById('dashboard-box');
+
+    // Cek sesi login
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      loginBox.classList.add('hidden');
+      dashBox.classList.remove('hidden');
+    }
+
+    // Proses Login
+    document.getElementById('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      });
+      if (error) alert('Login gagal: ' + error.message);
+      else location.reload();
+    });
+
+    // Logout
+    document.getElementById('btn-logout').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      location.reload();
+    });
+
+    // Simpan Pengumuman (Pastikan kebijakan RLS INSERT untuk authenticated user aktif di Supabase)
+    document.getElementById('form-pengumuman').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { error } = await supabase.from('pengumuman').insert([{
+        judul: document.getElementById('judul').value,
+        kategori: document.getElementById('kategori').value,
+        isi: document.getElementById('isi').value
+      }]);
+      if (error) alert(error.message);
+      else { alert('Pengumuman diterbitkan!'); e.target.reset(); }
+    });
+
+    // Simpan Kas
+    document.getElementById('form-kas').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { error } = await supabase.from('kas_rt').insert([{
+        keterangan: document.getElementById('ket_kas').value,
+        jenis: document.getElementById('jenis_kas').value,
+        nominal: document.getElementById('nominal_kas').value
+      }]);
+      if (error) alert(error.message);
+      else { alert('Data kas tersimpan!'); e.target.reset(); }
+    });
+  </script>
+</body>
+</html>

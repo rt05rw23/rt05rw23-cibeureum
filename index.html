@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Resmi RT 05 / RW 23 - Kelurahan Cibeureum</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+          05
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-900 leading-tight text-sm sm:text-base">RT 05 / RW 23</h1>
+          <p class="text-xs text-slate-500">Kelurahan Cibeureum</p>
+        </div>
+      </div>
+      <div class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+        <a href="#pengumuman" class="hover:text-blue-600 transition">Pengumuman</a>
+        <a href="#layanan" class="hover:text-blue-600 transition">Layanan Surat</a>
+        <a href="#keuangan" class="hover:text-blue-600 transition">Transparansi Kas</a>
+        <a href="#pengurus" class="hover:text-blue-600 transition">Pengurus</a>
+      </div>
+      <a href="admin.html" class="text-xs sm:text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-lg transition">
+        Portal Pengurus
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="bg-gradient-to-b from-blue-600 to-blue-700 text-white py-16 sm:py-20 px-4">
+    <div class="max-w-4xl mx-auto text-center">
+      <span class="inline-block bg-blue-500/40 border border-blue-400/30 text-blue-50 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+        Sistem Informasi & Pelayanan Digital Warga
+      </span>
+      <h2 class="text-3xl sm:text-5xl font-bold tracking-tight mb-4">
+        Guyub, Rukun, dan Transparan untuk RT 05 / RW 23
+      </h2>
+      <p class="text-blue-100 text-sm sm:text-lg max-w-2xl mx-auto mb-8">
+        Pusat informasi kegiatan lingkungan, pengajuan surat pengantar online, dan laporan transparansi kas warga Kelurahan Cibeureum.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        <a href="#layanan" class="bg-white text-blue-700 font-semibold px-6 py-3 rounded-xl shadow-sm hover:bg-blue-50 transition">
+          Ajukan Surat Pengantar
+        </a>
+        <a href="#keuangan" class="bg-blue-800/60 text-white border border-blue-400/30 font-semibold px-6 py-3 rounded-xl hover:bg-blue-800 transition">
+          Cek Laporan Kas RT
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-12 space-y-20">
+
+    <!-- Section 1: Pengumuman Warga -->
+    <section id="pengumuman">
+      <div class="flex items-end justify-between mb-6">
+        <div>
+          <h3 class="text-2xl font-bold text-slate-900">Papan Pengumuman</h3>
+          <p class="text-sm text-slate-500 mt-1">Informasi terbaru seputar kegiatan & kebijakan lingkungan</p>
+        </div>
+      </div>
+      <div id="list-pengumuman" class="grid md:grid-cols-3 gap-6">
+        <!-- Data dimuat otomatis dari Supabase -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm animate-pulse">
+          <div class="h-4 bg-slate-200 rounded w-1/3 mb-3"></div>
+          <div class="h-5 bg-slate-200 rounded w-3/4 mb-2"></div>
+          <div class="h-16 bg-slate-100 rounded"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Layanan Surat Pengantar Online -->
+    <section id="layanan" class="grid lg:grid-cols-12 gap-8 items-start">
+      <div class="lg:col-span-5 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Pengajuan Surat Pengantar</h3>
+        <p class="text-sm text-slate-500 mb-6">Isi formulir di bawah ini untuk mempermudah pembuatan surat pengantar RT/RW.</p>
+        
+        <form id="form-surat" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap (Sesuai KTP)</label>
+            <input type="text" id="nama" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none" placeholder="Contoh: Budi Santoso">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">NIK (16 Digit)</label>
+              <input type="text" id="nik" maxlength="16" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none" placeholder="327701...">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp</label>
+              <input type="tel" id="wa" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none" placeholder="0812...">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Jenis Surat Pengantar</label>
+            <select id="jenis_surat" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none bg-white">
+              <option value="Pengantar KTP / KK">Pengantar Pembuatan KTP / KK</option>
+              <option value="Surat Keterangan Domisili">Surat Keterangan Domisili</option>
+              <option value="Surat Keterangan Usaha (SKU)">Surat Keterangan Usaha (SKU)</option>
+              <option value="Surat Keterangan Tidak Mampu">Surat Keterangan Tidak Mampu (SKTM)</option>
+              <option value="Surat Pengantar Nikah">Surat Pengantar Nikah</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan Tambahan</label>
+            <textarea id="keperluan" rows="2" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Keperluan pengajuan surat..."></textarea>
+          </div>
+          <button type="submit" id="btn-submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition shadow-sm">
+            Kirim Pengajuan
+          </button>
+        </form>
+      </div>
+
+      <!-- Status Pengajuan Terbaru -->
+      <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Pantau Status Pengajuan</h3>
+        <p class="text-sm text-slate-500 mb-6">Daftar antrean pengajuan surat warga RT 05 / RW 23</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+                <th class="py-3 px-2">Pemohon</th>
+                <th class="py-3 px-2">Jenis Surat</th>
+                <th class="py-3 px-2">Status</th>
+              </tr>
+            </thead>
+            <tbody id="tabel-surat" class="divide-y divide-slate-100 text-sm">
+              <!-- Diisi otomatis dari Supabase -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Transparansi Kas RT -->
+    <section id="keuangan" class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h3 class="text-2xl font-bold text-slate-900">Transparansi Kas RT 05</h3>
+          <p class="text-sm text-slate-500">Laporan pemasukan iuran & pengeluaran operasional lingkungan</p>
+        </div>
+        <div class="bg-blue-50 border border-blue-100 px-5 py-3 rounded-xl">
+          <span class="text-xs font-medium text-blue-600 block">Saldo Kas Saat Ini</span>
+          <span id="total-saldo" class="text-xl font-bold text-blue-900">Rp 0</span>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-xs font-semibold text-slate-500 uppercase">
+              <th class="py-3 px-4 rounded-l-lg">Tanggal</th>
+              <th class="py-3 px-4">Keterangan</th>
+              <th class="py-3 px-4">Jenis</th>
+              <th class="py-3 px-4 rounded-r-lg text-right">Nominal</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-kas" class="divide-y divide-slate-100 text-sm">
+            <!-- Diisi otomatis dari Supabase -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Section 4: Struktur Pengurus -->
+    <section id="pengurus">
+      <div class="text-center max-w-xl mx-auto mb-10">
+        <h3 class="text-2xl font-bold text-slate-900">Struktur Pengurus RT 05 / RW 23</h3>
+        <p class="text-sm text-slate-500 mt-1">Periode Bakti Kelurahan Cibeureum</p>
+      </div>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center">
+          <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold mx-auto mb-3">RT</div>
+          <h4 class="font-bold text-slate-900">Nama Ketua RT</h4>
+          <p class="text-xs text-blue-600 font-medium mb-3">Ketua RT 05</p>
+          <a href="https://wa.me/6281234567890" class="inline-block text-xs bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 px-3 py-1.5 rounded-lg transition">Hubungi WA</a>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center">
+          <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold mx-auto mb-3">SK</div>
+          <h4 class="font-bold text-slate-900">Nama Sekretaris</h4>
+          <p class="text-xs text-blue-600 font-medium mb-3">Sekretaris RT</p>
+          <a href="https://wa.me/6281234567890" class="inline-block text-xs bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 px-3 py-1.5 rounded-lg transition">Hubungi WA</a>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center">
+          <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold mx-auto mb-3">BD</div>
+          <h4 class="font-bold text-slate-900">Nama Bendahara</h4>
+          <p class="text-xs text-blue-600 font-medium mb-3">Bendahara RT</p>
+          <a href="https://wa.me/6281234567890" class="inline-block text-xs bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 px-3 py-1.5 rounded-lg transition">Hubungi WA</a>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 text-center">
+          <div class="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold mx-auto mb-3">KM</div>
+          <h4 class="font-bold text-slate-900">Nama Seksi Keamanan</h4>
+          <p class="text-xs text-blue-600 font-medium mb-3">Keamanan & Ketertiban</p>
+          <a href="https://wa.me/6281234567890" class="inline-block text-xs bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 px-3 py-1.5 rounded-lg transition">Hubungi WA</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-8 text-center text-xs text-slate-500">
+    <p>&copy; 2026 Kepengurusan RT 05 / RW 23 Kelurahan Cibeureum. Dikelola secara digital untuk warga.</p>
+  </footer>
+
+  <!-- Script Integrasi Supabase -->
+  <script type="module">
+    import { supabase } from './js/config.js';
+
+    const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+
+    // 1. Muat Pengumuman
+    async function loadPengumuman() {
+      const container = document.getElementById('list-pengumuman');
+      const { data, error } = await supabase.from('pengumuman').select('*').order('created_at', { ascending: false }).limit(3);
+      
+      if (error || !data || data.length === 0) {
+        container.innerHTML = `<p class="text-sm text-slate-400 col-span-3">Belum ada pengumuman terbaru.</p>`;
+        return;
+      }
+
+      container.innerHTML = data.map(item => `
+        <article class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-300 transition">
+          <div class="flex items-center justify-between text-xs mb-3">
+            <span class="bg-blue-50 text-blue-600 font-semibold px-2.5 py-1 rounded-md">${item.kategori}</span>
+            <span class="text-slate-400">${item.tanggal}</span>
+          </div>
+          <h4 class="font-bold text-slate-900 mb-2">${item.judul}</h4>
+          <p class="text-sm text-slate-600 leading-relaxed">${item.isi}</p>
+        </article>
+      `).join('');
+    }
+
+    // 2. Muat Kas RT
+    async function loadKas() {
+      const tbody = document.getElementById('tabel-kas');
+      const { data, error } = await supabase.from('kas_rt').select('*').order('tanggal', { ascending: false }).limit(10);
+      
+      if (error || !data) return;
+
+      let saldo = 0;
+      data.forEach(row => {
+        saldo += row.jenis === 'Masuk' ? Number(row.nominal) : -Number(row.nominal);
+      });
+      document.getElementById('total-saldo').textContent = formatRupiah(saldo);
+
+      tbody.innerHTML = data.map(row => `
+        <tr>
+          <td class="py-3 px-4 text-slate-500">${row.tanggal}</td>
+          <td class="py-3 px-4 font-medium text-slate-800">${row.keterangan}</td>
+          <td class="py-3 px-4">
+            <span class="text-xs font-semibold px-2 py-0.5 rounded ${row.jenis === 'Masuk' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}">
+              ${row.jenis}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-right font-semibold ${row.jenis === 'Masuk' ? 'text-emerald-600' : 'text-rose-600'}">
+            ${row.jenis === 'Masuk' ? '+' : '-'} ${formatRupiah(row.nominal)}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 3. Muat Status Surat
+    async function loadSurat() {
+      const tbody = document.getElementById('tabel-surat');
+      const { data } = await supabase.from('pengajuan_surat').select('nama_pemohon, jenis_surat, status').order('created_at', { ascending: false }).limit(6);
+      
+      if (!data) return;
+      tbody.innerHTML = data.map(s => `
+        <tr>
+          <td class="py-3 px-2 font-medium text-slate-800">${s.nama_pemohon}</td>
+          <td class="py-3 px-2 text-slate-600">${s.jenis_surat}</td>
+          <td class="py-3 px-2">
+            <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${s.status === 'Selesai' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">
+              ${s.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 4. Kirim Pengajuan Surat
+    document.getElementById('form-surat').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.textContent = 'Mengirim...';
+
+      const payload = {
+        nama_pemohon: document.getElementById('nama').value,
+        nik: document.getElementById('nik').value,
+        no_wa: document.getElementById('wa').value,
+        jenis_surat: document.getElementById('jenis_surat').value,
+        keperluan: document.getElementById('keperluan').value
+      };
+
+      const { error } = await supabase.from('pengajuan_surat').insert([payload]);
+      
+      if (error) {
+        alert('Gagal mengirim pengajuan: ' + error.message);
+      } else {
+        alert('Pengajuan surat berhasil dikirim! Pengurus RT akan segera memprosesnya.');
+        e.target.reset();
+        loadSurat();
+      }
+      btn.disabled = false;
+      btn.textContent = 'Kirim Pengajuan';
+    });
+
+    loadPengumuman();
+    loadKas();
+    loadSurat();
+  </script>
+</body>
+</html>
