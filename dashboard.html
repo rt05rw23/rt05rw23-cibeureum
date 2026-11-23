@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Smart RT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #FAFAFA; color: #1E293B; }
+    h1, h2, h3, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Topbar -->
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-[#1B4332] text-white flex items-center justify-center font-heading font-bold text-sm">RT</div>
+        <div>
+          <span id="userName" class="font-heading font-bold text-sm text-slate-900 block leading-none">Memuat...</span>
+          <span id="userRoleBadge" class="text-[11px] text-[#1B4332] font-medium uppercase tracking-wider">...</span>
+        </div>
+      </div>
+      <button id="logoutBtn" class="text-xs font-medium text-slate-500 hover:text-rose-600 px-3 py-1.5 rounded-lg border border-slate-200 transition">
+        Keluar
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8 space-y-8">
+
+    <!-- ================= 1. DASHBOARD WARGA ================= -->
+    <section id="view-warga" class="hidden space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="bg-[#1B4332] text-white p-6 rounded-2xl">
+          <span class="text-xs text-emerald-200/80 uppercase">Saldo Kas RT Saat Ini</span>
+          <div id="wargaSaldoKas" class="text-3xl font-heading font-bold mt-1">Rp 0</div>
+          <p class="text-xs text-emerald-200/70 mt-3">Transparansi keuangan real-time</p>
+        </div>
+
+        <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80">
+          <h2 class="font-heading font-bold text-base text-slate-900 mb-3">Ajukan Surat Pengantar Baru</h2>
+          <form id="formSurat" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <select id="jenisSurat" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white">
+              <option value="Pengantar KTP / KK">Pengantar KTP / KK</option>
+              <option value="Surat Domisili">Surat Keterangan Domisili</option>
+              <option value="Pengantar SKCK">Pengantar SKCK</option>
+              <option value="Keterangan Usaha">Keterangan Usaha (SKU)</option>
+            </select>
+            <input type="text" id="ketSurat" required placeholder="Keperluan singkat..." class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm" />
+            <button type="submit" class="bg-[#1B4332] text-white text-sm font-medium rounded-xl py-2.5 hover:bg-[#143326] transition">
+              Kirim Pengajuan
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Riwayat Surat Warga -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
+        <div class="p-5 border-b border-slate-100">
+          <h3 class="font-heading font-bold text-sm text-slate-900">Status Pengajuan Surat Saya</h3>
+        </div>
+        <div id="listSuratWarga" class="divide-y divide-slate-100 text-sm"></div>
+      </div>
+    </section>
+
+    <!-- ================= 2. DASHBOARD ADMIN (PENGURUS RT) ================= -->
+    <section id="view-admin" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Validasi Surat Masuk -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+            <h3 class="font-heading font-bold text-sm text-slate-900">Antrean Persetujuan Surat</h3>
+            <span class="text-xs text-slate-400">Admin RT</span>
+          </div>
+          <div id="listSuratAdmin" class="divide-y divide-slate-100 text-sm"></div>
+        </div>
+
+        <!-- Input Kas RT -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 h-fit">
+          <h3 class="font-heading font-bold text-sm text-slate-900 mb-4">Catat Transaksi Kas RT</h3>
+          <form id="formKas" class="space-y-3">
+            <input type="text" id="judulKas" required placeholder="Keterangan (mis: Iuran Blok A / Beli Lampu)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm" />
+            <div class="grid grid-cols-2 gap-3">
+              <input type="number" id="nominalKas" required placeholder="Nominal (Rp)" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm" />
+              <select id="tipeKas" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white">
+                <option value="pemasukan">Pemasukan (+)</option>
+                <option value="pengeluaran">Pengeluaran (-)</option>
+              </select>
+            </div>
+            <button type="submit" class="w-full bg-[#1B4332] text-white text-sm font-medium py-2.5 rounded-xl hover:bg-[#143326] transition">
+              Simpan ke Buku Kas
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. DASHBOARD SUPER ADMIN (RW / SISTEM) ================= -->
+    <section id="view-superadmin" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
+        <div class="p-5 border-b border-slate-100 flex justify-between items-center">
+          <div>
+            <h3 class="font-heading font-bold text-sm text-slate-900">Manajemen Hak Akses & Warga (Super Admin)</h3>
+            <p class="text-xs text-slate-500">Ubah peran pengguna antara Warga, Admin RT, dan Super Admin</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+              <tr>
+                <th class="px-5 py-3">Nama Warga</th>
+                <th class="px-5 py-3">No. Rumah / RT</th>
+                <th class="px-5 py-3">Peran Saat Ini</th>
+                <th class="px-5 py-3">Ubah Peran</th>
+              </tr>
+            </thead>
+            <tbody id="tableUsersSuperAdmin" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
