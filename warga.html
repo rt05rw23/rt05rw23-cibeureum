@@ -229,7 +229,7 @@
       btn.disabled = false;
     });
 
-    // Fungsi Cetak Surat Aman
+    // Fungsi Cetak Surat Bersih (Hanya terpanggil saat tombol Cetak Surat diklik)
     window.printSurat = async (id) => {
       const { data: s } = await supabase.from('surat_pengantar').select('*').eq('id', id).single();
       const { data: cfg } = await supabase.from('pengaturan_surat').select('*').single();
