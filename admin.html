@@ -52,7 +52,7 @@
           <h2 class="text-lg font-bold text-slate-900">Kelola Pengajuan Surat Warga</h2>
           <p class="text-xs text-slate-500">Ubah status pengajuan, kirim notifikasi WA, atau cetak surat pengantar</p>
         </div>
-        <button onclick="loadAdminSurat()" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold px-3 py-1.5 rounded-lg transition">Muat Ulang</button>
+        <button id="btn-reload-surat" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold px-3 py-1.5 rounded-lg transition">Muat Ulang</button>
       </div>
 
       <div class="overflow-x-auto">
@@ -130,13 +130,11 @@
     const loginBox = document.getElementById('login-box');
     const dashBox = document.getElementById('dashboard-box');
 
-    // Cek Sesi Login Aktif
+    // Cek Sesi Login
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
       loginBox.classList.add('hidden');
       dashBox.classList.remove('hidden');
-      
-      // Panggil fungsi pemuatan data secara bersamaan
       loadAdminSurat();
       loadAdminPengumuman();
       loadAdminKas();
@@ -145,27 +143,25 @@
       dashBox.classList.add('hidden');
     }
 
-    // Proses Login
+    // Login
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        alert('Login gagal: ' + error.message);
-      } else {
-        location.reload();
-      }
+      if (error) alert('Login gagal: ' + error.message);
+      else location.reload();
     });
 
-    // Proses Logout
+    // Logout
     document.getElementById('btn-logout').addEventListener('click', async () => {
       await supabase.auth.signOut();
       location.reload();
     });
 
-    // Format Nomor WA ke Format Internasional (62...)
+    document.getElementById('btn-reload-surat').addEventListener('click', loadAdminSurat);
+
     function formatWA(nomor) {
       if (!nomor) return '';
       let clean = nomor.toString().replace(/\D/g, '');
@@ -173,8 +169,8 @@
       return clean;
     }
 
-    // 1. FUNGSI MUAT DAFTAR SURAT WARGA
-    window.loadAdminSurat = async function() {
+    // 1. MUAT DAFTAR SURAT WARGA
+    async function loadAdminSurat() {
       const tbody = document.getElementById('admin-tabel-surat');
       tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">Memuat data surat...</td></tr>`;
 
@@ -184,7 +180,7 @@
         .order('created_at', { ascending: false });
 
       if (error) {
-        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-rose-500 text-xs">Gagal memuat: ${error.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-rose-500 text-xs">Error: ${error.message}</td></tr>`;
         return;
       }
 
@@ -211,7 +207,7 @@
               <p class="text-xs text-slate-500 mt-0.5">${item.keperluan || '-'}</p>
             </td>
             <td class="py-3.5 px-3 align-top">
-              <select onchange="ubahStatusSurat('${item.id}', this.value)" class="text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-blue-500">
+              <select data-id="${item.id}" class="select-status text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="Menunggu Verifikasi" ${item.status === 'Menunggu Verifikasi' ? 'selected' : ''}>Menunggu Verifikasi</option>
                 <option value="Diproses" ${item.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
                 <option value="Selesai" ${item.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
@@ -224,43 +220,47 @@
               <a href="https://wa.me/${waNumber}?text=${pesanWA}" target="_blank" class="inline-block text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1.5 rounded-lg transition">
                 Info WA
               </a>
-              <button onclick="hapusData('pengajuan_surat', '${item.id}')" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-2.5 py-1.5 rounded-lg transition">
+              <button data-tabel="pengajuan_surat" data-id="${item.id}" class="btn-hapus text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-2.5 py-1.5 rounded-lg transition">
                 Hapus
               </button>
             </td>
           </tr>
         `;
       }).join('');
-    };
 
-    // Fungsi Ubah Status Surat
-    window.ubahStatusSurat = async function(id, statusBaru) {
-      const { error } = await supabase
-        .from('pengajuan_surat')
-        .update({ status: statusBaru })
-        .eq('id', id);
+      // Pasang event listener untuk ubah status
+      document.querySelectorAll('.select-status').forEach(sel => {
+        sel.addEventListener('change', async (e) => {
+          const id = e.target.getAttribute('data-id');
+          const statusBaru = e.target.value;
+          const { error } = await supabase.from('pengajuan_surat').update({ status: statusBaru }).eq('id', id);
+          if (error) alert('Gagal mengubah status: ' + error.message);
+          else loadAdminSurat();
+        });
+      });
 
-      if (error) {
-        alert('Gagal mengubah status: ' + error.message);
-      } else {
-        loadAdminSurat();
-      }
-    };
+      pasangEventHapus();
+    }
 
-    // Fungsi Umum Hapus Data
-    window.hapusData = async function(tabel, id) {
-      if (!confirm('Yakin ingin menghapus data ini?')) return;
-      const { error } = await supabase.from(tabel).delete().eq('id', id);
-      if (error) {
-        alert('Gagal menghapus: ' + error.message);
-      } else {
-        if (tabel === 'pengajuan_surat') loadAdminSurat();
-        if (tabel === 'pengumuman') loadAdminPengumuman();
-        if (tabel === 'kas_rt') loadAdminKas();
-      }
-    };
+    function pasangEventHapus() {
+      document.querySelectorAll('.btn-hapus').forEach(btn => {
+        btn.onclick = async () => {
+          if (!confirm('Yakin ingin menghapus data ini?')) return;
+          const tabel = btn.getAttribute('data-tabel');
+          const id = btn.getAttribute('data-id');
+          const { error } = await supabase.from(tabel).delete().eq('id', id);
+          if (error) {
+            alert('Gagal menghapus: ' + error.message);
+          } else {
+            if (tabel === 'pengajuan_surat') loadAdminSurat();
+            if (tabel === 'pengumuman') loadAdminPengumuman();
+            if (tabel === 'kas_rt') loadAdminKas();
+          }
+        };
+      });
+    }
 
-    // 2. FUNGSI PENGUMUMAN
+    // 2. PENGUMUMAN
     document.getElementById('form-pengumuman').addEventListener('submit', async (e) => {
       e.preventDefault();
       const judul = document.getElementById('judul').value;
@@ -269,7 +269,7 @@
 
       const { error } = await supabase.from('pengumuman').insert([{ judul, kategori, isi }]);
       if (error) {
-        alert('Gagal: ' + error.message);
+        alert('Gagal menerbitkan pengumuman: ' + error.message);
       } else {
         alert('Pengumuman berhasil diterbitkan!');
         e.target.reset();
@@ -284,12 +284,13 @@
       box.innerHTML = data.map(p => `
         <div class="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-lg">
           <span class="truncate pr-2 font-medium text-slate-700">${p.judul}</span>
-          <button onclick="hapusData('pengumuman', '${p.id}')" class="text-rose-600 hover:underline shrink-0">Hapus</button>
+          <button data-tabel="pengumuman" data-id="${p.id}" class="btn-hapus text-rose-600 hover:underline shrink-0">Hapus</button>
         </div>
       `).join('');
+      pasangEventHapus();
     }
 
-    // 3. FUNGSI KAS RT
+    // 3. KAS RT
     document.getElementById('form-kas').addEventListener('submit', async (e) => {
       e.preventDefault();
       const keterangan = document.getElementById('ket_kas').value;
@@ -298,7 +299,7 @@
 
       const { error } = await supabase.from('kas_rt').insert([{ keterangan, jenis, nominal }]);
       if (error) {
-        alert('Gagal: ' + error.message);
+        alert('Gagal menyimpan kas: ' + error.message);
       } else {
         alert('Data kas berhasil disimpan!');
         e.target.reset();
@@ -313,9 +314,10 @@
       box.innerHTML = data.map(k => `
         <div class="flex items-center justify-between bg-slate-50 px-3 py-2 rounded-lg">
           <span class="truncate pr-2 text-slate-700">${k.keterangan} (${k.jenis === 'Masuk' ? '+' : '-'}Rp${Number(k.nominal).toLocaleString('id-ID')})</span>
-          <button onclick="hapusData('kas_rt', '${k.id}')" class="text-rose-600 hover:underline shrink-0">Hapus</button>
+          <button data-tabel="kas_rt" data-id="${k.id}" class="btn-hapus text-rose-600 hover:underline shrink-0">Hapus</button>
         </div>
       `).join('');
+      pasangEventHapus();
     }
   </script>
 </body>
