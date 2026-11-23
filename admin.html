@@ -9,11 +9,12 @@
   <style>
     body { font-family: 'Inter', sans-serif; background: #FAFAFA; color: #1E293B; }
     h1, h2, h3, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+    @media print { body { background: white; } no-print { display: none; } }
   </style>
 </head>
 <body class="min-h-screen">
 
-  <header class="bg-white border-b border-slate-200/85 sticky top-0 z-30">
+  <header class="bg-white border-b border-slate-200/85 sticky top-0 z-30 no-print">
     <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-8 h-8 rounded-lg bg-[#1B4332] text-white flex items-center justify-center font-heading font-bold text-sm">RT</div>
@@ -30,7 +31,18 @@
   </header>
 
   <main class="max-w-5xl mx-auto px-6 py-8 space-y-8">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Panel Cetak Laporan Kas Bulanan -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-4 no-print">
+      <div>
+        <h3 class="font-heading font-bold text-base text-slate-900">Laporan Keuangan & Kas RT</h3>
+        <p class="text-xs text-slate-500">Cetak rekapitulasi iuran kematian, sampah, keamanan, dan kas umum bulanan.</p>
+      </div>
+      <button onclick="window.printLaporanKas()" class="bg-[#1B4332] hover:bg-[#143326] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-2">
+        🖨️ Cetak / Download PDF Laporan Kas
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 no-print">
       <!-- Verifikasi Warga & Cek KTP/KK -->
       <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
         <div class="p-5 border-b border-slate-100">
@@ -49,7 +61,7 @@
     </div>
 
     <!-- Input Buku Kas & Berbagai Kategori Iuran -->
-    <div class="bg-white p-6 rounded-2xl border border-slate-200/80">
+    <div class="bg-white p-6 rounded-2xl border border-slate-200/80 no-print">
       <h3 class="font-heading font-bold text-sm text-slate-900 mb-4">Input Keuangan / Iuran Warga</h3>
       <form id="formKas" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <input type="text" id="kJudul" required placeholder="Keterangan (mis: Iuran Sampah B2)" class="px-3 py-2.5 rounded-xl border border-slate-200 text-sm" />
@@ -73,7 +85,7 @@
   </main>
 
   <!-- Modal Pratinjau KTP & KK -->
-  <div id="modalDokumen" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+  <div id="modalDokumen" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 no-print">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-slate-100 space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="font-heading font-bold text-base text-slate-900">Verifikasi Dokumen Warga</h3>
@@ -172,6 +184,89 @@
       loadAdminData();
       alert('Transaksi kas berhasil dicatat!');
     });
+
+    // Fitur Cetak Laporan Kas Bulanan dalam Format PDF/Cetak Bersih
+    window.printLaporanKas = async () => {
+      const { data: kasList } = await supabase.from('kas_rt').select('*').order('created_at', { ascending: false });
+      const { data: cfg } = await supabase.from('pengaturan_surat').select('*').single();
+
+      let totalPemasukan = 0;
+      let totalPengeluaran = 0;
+
+      const rows = (kasList || []).map((k, idx) => {
+        if (k.tipe === 'pemasukan') totalPemasukan += Number(k.nominal);
+        else totalPengeluaran += Number(k.nominal);
+
+        return `
+          <tr class="border-b border-slate-200">
+            <td class="p-2 text-center">${idx + 1}</td>
+            <td class="p-2">${new Date(k.created_at).toLocaleDateString('id-ID')}</td>
+            <td class="p-2">${k.judul}</td>
+            <td class="p-2">${k.kategori || 'Umum'}</td>
+            <td class="p-2 text-right ${k.tipe === 'pemasukan' ? 'text-emerald-700 font-semibold' : 'text-slate-500'}">
+              ${k.tipe === 'pemasukan' ? 'Rp ' + Number(k.nominal).toLocaleString('id-ID') : '-'}
+            </td>
+            <td class="p-2 text-right ${k.tipe === 'pengeluaran' ? 'text-rose-700 font-semibold' : 'text-slate-500'}">
+              ${k.tipe === 'pengeluaran' ? 'Rp ' + Number(k.nominal).toLocaleString('id-ID') : '-'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const saldoAkhir = totalPemasukan - totalPengeluaran;
+
+      const printWindow = window.open('', '_print', 'width=900,height=700');
+      printWindow.document.write(`
+        <html>
+        <head>
+          <title>Laporan Kas Bulanan RT</title>
+          <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="p-10 font-sans text-slate-900 bg-white">
+          <div class="text-center border-b-2 border-slate-900 pb-4 mb-6">
+            <h3 class="font-bold text-sm tracking-wider">${cfg?.kop_baris_1 || 'PEMERINTAH KOTA'}</h3>
+            <h4 class="font-bold text-xs uppercase">${cfg?.kop_baris_2 || 'KECAMATAN — KELURAHAN'}</h4>
+            <h2 class="font-bold text-base mt-1">${cfg?.kop_baris_3 || 'RUKUN TETANGGA 04'}</h2>
+            <p class="text-[11px] text-slate-600">${cfg?.alamat_sekretariat || ''}</p>
+          </div>
+          <div class="text-center my-6">
+            <h1 class="font-bold text-lg uppercase underline">LAPORAN KAS & IURAN BULANAN</h1>
+            <p class="text-xs text-slate-500 mt-1">Periode: ${new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</p>
+          </div>
+          <table class="w-full text-left text-xs border-collapse border border-slate-300 mb-6">
+            <thead>
+              <tr class="bg-slate-100 border-b border-slate-300">
+                <th class="p-2 text-center w-10">No</th>
+                <th class="p-2">Tanggal</th>
+                <th class="p-2">Keterangan</th>
+                <th class="p-2">Kategori</th>
+                <th class="p-2 text-right">Pemasukan</th>
+                <th class="p-2 text-right">Pengeluaran</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows || '<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada data transaksi.</td></tr>'}
+            </tbody>
+          </table>
+          <div class="flex justify-between items-start text-xs border-t-2 border-slate-900 pt-4 mb-8">
+            <div class="space-y-1">
+              <p>Total Pemasukan: <strong class="text-emerald-700">Rp ${totalPemasukan.toLocaleString('id-ID')}</strong></p>
+              <p>Total Pengeluaran: <strong class="text-rose-700">Rp ${totalPengeluaran.toLocaleString('id-ID')}</strong></p>
+              <p class="text-sm font-bold mt-2">Saldo Bersih Kas: Rp ${saldoAkhir.toLocaleString('id-ID')}</p>
+            </div>
+            <div class="text-center">
+              <p>Cimahi, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+              <p class="font-bold mt-1">Bendahara / Ketua RT 04</p>
+              <div class="h-16"></div>
+              <p class="font-bold underline">${cfg?.nama_ketua_rt || 'Bpk. Ahmad Fauzi'}</p>
+            </div>
+          </div>
+          <script>window.print();</script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    };
 
     initAdmin();
   </script>
