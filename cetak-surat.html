@@ -43,62 +43,67 @@
 
     <!-- JUDUL & NOMOR SURAT -->
     <div class="text-center mb-6">
-      <h4 class="text-base font-bold underline uppercase">SURAT PENGANTAR</h4>
+      <h4 class="text-base font-bold underline uppercase" id="out-jenis-judul">SURAT PENGANTAR</h4>
       <p class="text-sm" contenteditable="true">Nomor: 001 / SP-RT05 / RW23 / <span id="tahun-surat">2026</span></p>
     </div>
 
     <!-- PEMBUKA -->
     <p class="text-sm mb-4 text-justify">
-      Yang bertanda tangan di bawah ini Ketua RT 05 / RW 23 Kelurahan Cibeureum, Kecamatan Cimahi Selatan, Kota Cimahi, dengan ini menerangkan bahwa:
+      Yang bertanda tangan di bawah ini Ketua RT 05 / RW 23 Kelurahan Cibeureum, Kecamatan Cimahi Selatan, Kota Cimahi, dengan ini menerangkan bahwa warga kami:
     </p>
 
-    <!-- BIODATA WARGA -->
+    <!-- BIODATA WARGA LENGKAP -->
     <table class="w-full text-sm mb-5">
       <tr>
-        <td class="w-44 py-1">Nama Lengkap</td>
+        <td class="w-48 py-1 font-semibold">Nama Lengkap</td>
         <td class="w-4 py-1">:</td>
         <td class="py-1 font-bold uppercase" id="out-nama" contenteditable="true">Memuat...</td>
       </tr>
       <tr>
-        <td class="py-1">NIK</td>
+        <td class="py-1 font-semibold">No. Kartu Keluarga (KK)</td>
+        <td class="py-1">:</td>
+        <td class="py-1" id="out-nokk" contenteditable="true">-</td>
+      </tr>
+      <tr>
+        <td class="py-1 font-semibold">NIK</td>
         <td class="py-1">:</td>
         <td class="py-1" id="out-nik" contenteditable="true">-</td>
       </tr>
       <tr>
-        <td class="py-1">Tempat, Tanggal Lahir</td>
+        <td class="py-1 font-semibold">Tempat, Tanggal Lahir</td>
         <td class="py-1">:</td>
-        <td class="py-1 text-slate-600" contenteditable="true">[Klik untuk isi Tempat, Tgl Lahir]</td>
+        <td class="py-1" id="out-ttl" contenteditable="true">-</td>
       </tr>
       <tr>
-        <td class="py-1">Jenis Kelamin / Agama</td>
+        <td class="py-1 font-semibold">Jenis Kelamin</td>
         <td class="py-1">:</td>
-        <td class="py-1 text-slate-600" contenteditable="true">[Laki-laki / Perempuan] / Islam</td>
+        <td class="py-1" id="out-jk" contenteditable="true">-</td>
       </tr>
       <tr>
-        <td class="py-1">Pekerjaan</td>
+        <td class="py-1 font-semibold">Agama</td>
         <td class="py-1">:</td>
-        <td class="py-1 text-slate-600" contenteditable="true">[Klik untuk isi Pekerjaan]</td>
+        <td class="py-1" id="out-agama" contenteditable="true">-</td>
       </tr>
       <tr>
-        <td class="py-1 align-top">Alamat</td>
-        <td class="py-1 align-top">:</td>
-        <td class="py-1" contenteditable="true">RT 05 / RW 23 Kelurahan Cibeureum, Kec. Cimahi Selatan, Kota Cimahi</td>
+        <td class="py-1 font-semibold">Pekerjaan</td>
+        <td class="py-1">:</td>
+        <td class="py-1" id="out-pekerjaan" contenteditable="true">-</td>
       </tr>
       <tr>
-        <td class="py-1 align-top">Jenis Pengantar</td>
-        <td class="py-1 align-top">:</td>
-        <td class="py-1 font-bold" id="out-jenis" contenteditable="true">-</td>
+        <td class="py-1 font-semibold align-top">Alamat</td>
+        <td class="py-1 font-semibold align-top">:</td>
+        <td class="py-1" id="out-alamat" contenteditable="true">-</td>
       </tr>
       <tr>
-        <td class="py-1 align-top">Keperluan</td>
-        <td class="py-1 align-top">:</td>
+        <td class="py-1 font-semibold align-top">Keperluan / Maksud</td>
+        <td class="py-1 font-semibold align-top">:</td>
         <td class="py-1" id="out-keperluan" contenteditable="true">-</td>
       </tr>
     </table>
 
     <!-- PENUTUP -->
     <p class="text-sm mb-10 text-justify">
-      Demikian surat pengantar ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana mestinya oleh yang bersangkutan.
+      Demikian surat pengantar ini dibuat dengan sebenarnya dan diberikan kepada yang bersangkutan untuk dapat dipergunakan sebagaimana mestinya dalam pengurusan administrasi kependudukan.
     </p>
 
     <!-- TANDA TANGAN -->
@@ -129,17 +134,25 @@
     const suratId = params.get('id');
 
     if (suratId) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('pengajuan_surat')
         .select('*')
         .eq('id', suratId)
         .single();
 
-      if (data) {
+      if (data && !error) {
         document.getElementById('out-nama').textContent = data.nama_pemohon;
+        document.getElementById('out-nokk').textContent = data.no_kk || '-';
         document.getElementById('out-nik').textContent = data.nik;
-        document.getElementById('out-jenis').textContent = data.jenis_surat;
-        document.getElementById('out-keperluan').textContent = data.keperluan || 'Pengurusan administrasi kependudukan';
+        document.getElementById('out-ttl').textContent = data.ttl || '-';
+        document.getElementById('out-jk').textContent = data.jenis_kelamin || '-';
+        document.getElementById('out-agama').textContent = data.agama || '-';
+        document.getElementById('out-pekerjaan').textContent = data.pekerjaan || '-';
+        document.getElementById('out-alamat').textContent = data.alamat || 'RT 05 / RW 23 Kelurahan Cibeureum';
+        document.getElementById('out-keperluan').textContent = data.keperluan ? `${data.jenis_surat} (${data.keperluan})` : data.jenis_surat;
+        document.getElementById('out-jenis-judul').textContent = `SURAT PENGANTAR ${data.jenis_surat.toUpperCase()}`;
+      } else {
+        alert('Data surat tidak ditemukan.');
       }
     }
   </script>
