@@ -17,7 +17,7 @@
     <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
       <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold mb-4">05</div>
       <h2 class="text-xl font-bold text-slate-900 mb-1">Login Pengurus RT 05</h2>
-      <p class="text-xs text-slate-500 mb-6">Masuk untuk mengelola surat pengantar, pengumuman & kas</p>
+      <p class="text-xs text-slate-500 mb-6">Masuk untuk mengelola surat pengantar, buku register, pengumuman & kas</p>
       <form id="form-login" class="space-y-4">
         <input type="email" id="email" required placeholder="Email Pengurus" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
         <input type="password" id="password" required placeholder="Password" class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
@@ -47,10 +47,10 @@
 
     <!-- BAGIAN 1: KELOLA & CETAK SURAT PENGANTAR -->
     <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div>
-          <h2 class="text-lg font-bold text-slate-900">Kelola Pengajuan Surat Warga</h2>
-          <p class="text-xs text-slate-500">Ubah status pengajuan, kirim notifikasi WA, atau cetak surat pengantar</p>
+          <h2 class="text-lg font-bold text-slate-900">Antrean & Pengesahan Surat Warga</h2>
+          <p class="text-xs text-slate-500">Klik "Cetak / Sahkan" untuk mengatur kop surat, penomoran otomatis, dan QR validasi</p>
         </div>
         <button id="btn-reload-surat" class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold px-3 py-1.5 rounded-lg transition">Muat Ulang</button>
       </div>
@@ -61,7 +61,7 @@
             <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
               <th class="py-3 px-3">Pemohon & NIK</th>
               <th class="py-3 px-3">Jenis Surat & Keperluan</th>
-              <th class="py-3 px-3">Status</th>
+              <th class="py-3 px-3">Status & Register</th>
               <th class="py-3 px-3 text-right">Aksi Pengurus</th>
             </tr>
           </thead>
@@ -72,7 +72,38 @@
       </div>
     </section>
 
-    <!-- BAGIAN 2: INPUT PENGUMUMAN & KAS RT -->
+    <!-- BAGIAN 2: BUKU REGISTER SURAT DIGITAL (EXPORT CSV/EXCEL) -->
+    <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div>
+          <h2 class="text-lg font-bold text-slate-900">Buku Register Surat Digital (Teregister)</h2>
+          <p class="text-xs text-slate-500">Arsip resmi surat pengantar yang telah disahkan dan memiliki nomor register</p>
+        </div>
+        <button id="btn-export-csv" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-xl shadow-sm transition">
+          Export Buku Register (Excel / CSV)
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase">
+              <th class="py-3 px-3">Nomor Surat</th>
+              <th class="py-3 px-3">Tanggal Sah</th>
+              <th class="py-3 px-3">Nama Pemohon</th>
+              <th class="py-3 px-3">NIK / No. KK</th>
+              <th class="py-3 px-3">Keperluan</th>
+              <th class="py-3 px-3 text-right">Validasi QR</th>
+            </tr>
+          </thead>
+          <tbody id="tabel-register" class="divide-y divide-slate-100">
+            <tr><td colspan="6" class="py-4 text-center text-slate-400 text-xs">Memuat buku register...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- BAGIAN 3: INPUT PENGUMUMAN & KAS RT -->
     <div class="grid md:grid-cols-2 gap-6">
       
       <!-- Tambah Pengumuman -->
@@ -129,6 +160,7 @@
 
     const loginBox = document.getElementById('login-box');
     const dashBox = document.getElementById('dashboard-box');
+    let dataTeregisterCache = [];
 
     // Cek Sesi Login
     const { data: { session } } = await supabase.auth.getSession();
@@ -146,10 +178,10 @@
     // Login
     document.getElementById('form-login').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+      });
       if (error) alert('Login gagal: ' + error.message);
       else location.reload();
     });
@@ -169,10 +201,10 @@
       return clean;
     }
 
-    // 1. MUAT DAFTAR SURAT WARGA
+    // 1. MUAT DAFTAR SURAT & BUKU REGISTER
     async function loadAdminSurat() {
       const tbody = document.getElementById('admin-tabel-surat');
-      tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">Memuat data surat...</td></tr>`;
+      const tbodyReg = document.getElementById('tabel-register');
 
       const { data, error } = await supabase
         .from('pengajuan_surat')
@@ -186,13 +218,15 @@
 
       if (!data || data.length === 0) {
         tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-xs">Belum ada pengajuan surat dari warga.</td></tr>`;
+        tbodyReg.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">Belum ada surat yang teregister.</td></tr>`;
         return;
       }
 
+      // Render Antrean Surat
       tbody.innerHTML = data.map(item => {
         const waNumber = formatWA(item.no_wa);
         const pesanWA = encodeURIComponent(
-          `Halo Bapak/Ibu *${item.nama_pemohon}*,\n\nPengajuan *${item.jenis_surat}* Anda di RT 05 / RW 23 Kelurahan Cibeureum telah berstatus: *${item.status}*.\n\nSilakan menghubungi pengurus RT untuk pengambilan atau tanda tangan. Terima kasih.`
+          `Halo Bapak/Ibu *${item.nama_pemohon}*,\n\nPengajuan *${item.jenis_surat}* Anda di RT 05 / RW 23 Kelurahan Cibeureum telah berstatus: *${item.status}*${item.nomor_surat ? `\nNomor Surat: *${item.nomor_surat}*` : ''}.\n\nSilakan menghubungi pengurus RT untuk pengambilan. Terima kasih.`
         );
 
         return `
@@ -206,16 +240,19 @@
               <span class="inline-block font-semibold text-slate-800">${item.jenis_surat}</span>
               <p class="text-xs text-slate-500 mt-0.5">${item.keperluan || '-'}</p>
             </td>
-            <td class="py-3.5 px-3 align-top">
-              <select data-id="${item.id}" class="select-status text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white outline-none focus:ring-2 focus:ring-blue-500">
+            <td class="py-3.5 px-3 align-top space-y-1.5">
+              <select data-id="${item.id}" class="select-status block text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white outline-none">
                 <option value="Menunggu Verifikasi" ${item.status === 'Menunggu Verifikasi' ? 'selected' : ''}>Menunggu Verifikasi</option>
                 <option value="Diproses" ${item.status === 'Diproses' ? 'selected' : ''}>Diproses</option>
                 <option value="Selesai" ${item.status === 'Selesai' ? 'selected' : ''}>Selesai</option>
               </select>
+              ${item.teregister 
+                ? `<span class="inline-block text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded">Teregister: ${item.nomor_surat}</span>` 
+                : `<span class="inline-block text-[10px] font-medium bg-slate-100 text-slate-500 px-2 py-0.5 rounded">Belum Teregister</span>`}
             </td>
             <td class="py-3.5 px-3 align-top text-right space-x-1 whitespace-nowrap">
               <a href="cetak-surat.html?id=${item.id}" target="_blank" class="inline-block text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg transition">
-                Cetak Surat
+                Cetak / Sahkan
               </a>
               <a href="https://wa.me/${waNumber}?text=${pesanWA}" target="_blank" class="inline-block text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1.5 rounded-lg transition">
                 Info WA
@@ -228,7 +265,32 @@
         `;
       }).join('');
 
-      // Pasang event listener untuk ubah status
+      // Filter & Render Buku Register Digital
+      dataTeregisterCache = data.filter(d => d.teregister === true);
+      if (dataTeregisterCache.length === 0) {
+        tbodyReg.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-slate-400 text-xs">Belum ada surat yang disahkan ke buku register.</td></tr>`;
+      } else {
+        tbodyReg.innerHTML = dataTeregisterCache.map(reg => {
+          const tglSah = reg.tgl_ttd ? new Date(reg.tgl_ttd).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+          return `
+            <tr class="hover:bg-slate-50/70">
+              <td class="py-3 px-3 font-mono font-semibold text-blue-700 whitespace-nowrap">${reg.nomor_surat}</td>
+              <td class="py-3 px-3 text-slate-600 whitespace-nowrap">${tglSah}</td>
+              <td class="py-3 px-3 font-bold text-slate-900">${reg.nama_pemohon}</td>
+              <td class="py-3 px-3 text-slate-600">
+                <div>NIK: ${reg.nik}</div>
+                <div class="text-[11px] text-slate-400">KK: ${reg.no_kk || '-'}</div>
+              </td>
+              <td class="py-3 px-3 text-slate-700">${reg.jenis_surat}</td>
+              <td class="py-3 px-3 text-right">
+                <a href="validasi.html?id=${reg.id}" target="_blank" class="text-xs text-emerald-600 font-semibold hover:underline">Cek QR &rarr;</a>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Listener Ubah Status
       document.querySelectorAll('.select-status').forEach(sel => {
         sel.addEventListener('change', async (e) => {
           const id = e.target.getAttribute('data-id');
@@ -241,6 +303,58 @@
 
       pasangEventHapus();
     }
+
+    // Export Buku Register ke CSV (Siap buka di Excel)
+    document.getElementById('btn-export-csv').addEventListener('click', () => {
+      if (!dataTeregisterCache || dataTeregisterCache.length === 0) {
+        alert('Belum ada data surat teregister untuk di-export.');
+        return;
+      }
+
+      const headers = [
+        'No Urut',
+        'Nomor Surat',
+        'Tanggal Disahkan',
+        'Nama Pemohon',
+        'No KK',
+        'NIK',
+        'Tempat Tanggal Lahir',
+        'Jenis Kelamin',
+        'Agama',
+        'Pekerjaan',
+        'Alamat',
+        'Jenis Surat',
+        'Keperluan'
+      ];
+
+      const rows = dataTeregisterCache.map((r, idx) => {
+        const tgl = r.tgl_ttd ? new Date(r.tgl_ttd).toLocaleString('id-ID') : '-';
+        return [
+          r.nomor_urut || (idx + 1),
+          `"${r.nomor_surat || ''}"`,
+          `"${tgl}"`,
+          `"${r.nama_pemohon || ''}"`,
+          `="${r.no_kk || ''}"`,
+          `="${r.nik || ''}"`,
+          `"${r.ttl || ''}"`,
+          `"${r.jenis_kelamin || ''}"`,
+          `"${r.agama || ''}"`,
+          `"${r.pekerjaan || ''}"`,
+          `"${(r.alamat || '').replace(/"/g, '""')}"`,
+          `"${r.jenis_surat || ''}"`,
+          `"${(r.keperluan || '').replace(/"/g, '""')}"`
+        ].join(',');
+      });
+
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Buku_Register_Surat_RT05_RW23_${new Date().getFullYear()}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    });
 
     function pasangEventHapus() {
       document.querySelectorAll('.btn-hapus').forEach(btn => {
@@ -263,14 +377,13 @@
     // 2. PENGUMUMAN
     document.getElementById('form-pengumuman').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const judul = document.getElementById('judul').value;
-      const kategori = document.getElementById('kategori').value;
-      const isi = document.getElementById('isi').value;
-
-      const { error } = await supabase.from('pengumuman').insert([{ judul, kategori, isi }]);
-      if (error) {
-        alert('Gagal menerbitkan pengumuman: ' + error.message);
-      } else {
+      const { error } = await supabase.from('pengumuman').insert([{
+        judul: document.getElementById('judul').value,
+        kategori: document.getElementById('kategori').value,
+        isi: document.getElementById('isi').value
+      }]);
+      if (error) alert('Gagal: ' + error.message);
+      else {
         alert('Pengumuman berhasil diterbitkan!');
         e.target.reset();
         loadAdminPengumuman();
@@ -293,14 +406,13 @@
     // 3. KAS RT
     document.getElementById('form-kas').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const keterangan = document.getElementById('ket_kas').value;
-      const jenis = document.getElementById('jenis_kas').value;
-      const nominal = document.getElementById('nominal_kas').value;
-
-      const { error } = await supabase.from('kas_rt').insert([{ keterangan, jenis, nominal }]);
-      if (error) {
-        alert('Gagal menyimpan kas: ' + error.message);
-      } else {
+      const { error } = await supabase.from('kas_rt').insert([{
+        keterangan: document.getElementById('ket_kas').value,
+        jenis: document.getElementById('jenis_kas').value,
+        nominal: document.getElementById('nominal_kas').value
+      }]);
+      if (error) alert('Gagal: ' + error.message);
+      else {
         alert('Data kas berhasil disimpan!');
         e.target.reset();
         loadAdminKas();
