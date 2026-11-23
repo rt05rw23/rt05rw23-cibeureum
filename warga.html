@@ -7,26 +7,26 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Inter', sans-serif; background: #FAFAFA; color: #1E293B; }
+    body { font-family: 'Inter', sans-serif; background: #F8FAFC; color: #1E293B; }
     h1, h2, h3, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
     @media print { body { background: white; } .no-print { display: none; } }
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-  <!-- Topbar -->
-  <header class="bg-white border-b border-slate-200/85 sticky top-0 z-30 no-print">
+  <!-- Topbar Biru-Putih -->
+  <header class="bg-white/90 backdrop-blur-md border-b border-blue-100 sticky top-0 z-30 no-print shadow-xs">
     <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-[#1B4332] text-white flex items-center justify-center font-heading font-bold text-sm">RT</div>
+        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-heading font-bold text-sm shadow-sm">RT</div>
         <div>
-          <span class="font-heading font-bold text-sm text-slate-900 block leading-none">Warga Smart RT</span>
-          <span class="text-[11px] text-[#1B4332] font-medium uppercase tracking-wider">Dashboard Warga</span>
+          <span class="font-heading font-bold text-sm text-slate-900 block leading-none">Dashboard Warga</span>
+          <span class="text-[11px] text-blue-600 font-semibold uppercase tracking-wider">Smart RT</span>
         </div>
       </div>
-      <div class="flex items-center gap-3">
-        <a href="admin.html" class="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100">Panel Admin</a>
-        <a href="index.html" class="text-xs font-medium text-slate-500 hover:text-rose-600 px-3 py-1.5 rounded-lg border border-slate-200 transition">Keluar</a>
+      <div class="flex items-center gap-2">
+        <a href="admin.html" class="text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 px-3.5 py-2 rounded-xl transition">Panel Admin</a>
+        <a href="index.html" class="text-xs font-medium text-slate-500 hover:text-rose-600 px-3 py-2 rounded-xl transition border border-slate-200">Keluar</a>
       </div>
     </div>
   </header>
@@ -34,28 +34,28 @@
   <main class="max-w-5xl mx-auto px-6 py-8 space-y-8 no-print">
     
     <!-- GRID ATAS: SALDO KAS & FORM SURAT -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       
-      <!-- Saldo Kas RT Real-Time -->
-      <div class="bg-[#1B4332] text-white p-6 rounded-2xl flex flex-col justify-between shadow-xs">
+      <!-- Saldo Kas RT Real-Time (Tema Biru Elegan) -->
+      <div class="bg-gradient-to-br from-blue-600 to-blue-700 text-white p-6 rounded-2xl flex flex-col justify-between shadow-md">
         <div>
-          <span class="text-xs text-emerald-200/80 uppercase tracking-wider">Saldo Kas RT Real-Time</span>
+          <span class="text-xs text-blue-100 uppercase tracking-wider font-semibold">Saldo Kas RT Real-Time</span>
           <div id="wargaSaldoKas" class="text-3xl font-heading font-bold mt-2">Rp 0</div>
         </div>
-        <div class="mt-6 pt-4 border-t border-white/15 text-xs text-emerald-200">
-          Transparansi iuran warga & kuitansi
+        <div class="mt-6 pt-4 border-t border-white/20 text-xs text-blue-100">
+          Transparansi iuran warga & kuitansi resmi
         </div>
       </div>
 
       <!-- Form Pengajuan Surat Pengantar -->
-      <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs">
+      <div class="md:col-span-2 bg-white p-6 md:p-8 rounded-2xl border border-blue-100 shadow-xs">
         <h2 class="font-heading font-bold text-base text-slate-900 mb-1">Ajukan Surat Pengantar</h2>
-        <p class="text-xs text-slate-500 mb-4">Isi data dengan benar agar dapat langsung diproses oleh Admin RT.</p>
+        <p class="text-xs text-slate-500 mb-5">Isi data lengkap sesuai KTP agar dapat diproses oleh Admin RT.</p>
         
-        <form id="formSurat" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <form id="formSurat" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="text-xs font-medium text-slate-600">Jenis Surat</label>
-            <select id="sJenis" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:border-[#1B4332]">
+            <label class="text-xs font-semibold text-slate-700">Jenis Surat</label>
+            <select id="sJenis" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/50 focus:outline-none focus:border-blue-600">
               <option value="Surat Pengantar KTP / KK">Surat Pengantar KTP / KK</option>
               <option value="Surat Keterangan Domisili">Surat Keterangan Domisili</option>
               <option value="Surat Pengantar SKCK">Surat Pengantar SKCK</option>
@@ -64,34 +64,34 @@
             </select>
           </div>
           <div>
-            <label class="text-xs font-medium text-slate-600">Nama Lengkap Sesuai KTP</label>
-            <input type="text" id="sNama" required placeholder="Nama lengkap" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+            <label class="text-xs font-semibold text-slate-700">Nama Lengkap Sesuai KTP</label>
+            <input type="text" id="sNama" required placeholder="Nama lengkap" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/50 focus:outline-none focus:border-blue-600" />
           </div>
           <div>
-            <label class="text-xs font-medium text-slate-600">NIK</label>
-            <input type="text" id="sNik" required placeholder="16 digit NIK" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+            <label class="text-xs font-semibold text-slate-700">NIK (16 Digit)</label>
+            <input type="text" id="sNik" required placeholder="327701..." class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/50 focus:outline-none focus:border-blue-600" />
           </div>
           <div>
-            <label class="text-xs font-medium text-slate-600">Nomor KK</label>
-            <input type="text" id="sNoKk" required placeholder="16 digit No. KK" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+            <label class="text-xs font-semibold text-slate-700">Nomor KK (16 Digit)</label>
+            <input type="text" id="sNoKk" required placeholder="327700..." class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/50 focus:outline-none focus:border-blue-600" />
           </div>
           <div>
-            <label class="text-xs font-medium text-slate-600">Jenis Kelamin</label>
-            <select id="sJk" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:border-[#1B4332]">
+            <label class="text-xs font-semibold text-slate-700">Jenis Kelamin</label>
+            <select id="sJk" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/50 focus:outline-none focus:border-blue-600">
               <option value="Laki-laki">Laki-laki</option>
               <option value="Perempuan">Perempuan</option>
             </select>
           </div>
           <div>
-            <label class="text-xs font-medium text-slate-600">Pekerjaan Sesuai KTP</label>
-            <input type="text" id="sPekerjaan" required placeholder="Pekerjaan" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+            <label class="text-xs font-semibold text-slate-700">Pekerjaan Sesuai KTP</label>
+            <input type="text" id="sPekerjaan" required placeholder="Pekerjaan" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/50 focus:outline-none focus:border-blue-600" />
           </div>
           <div class="sm:col-span-2">
-            <label class="text-xs font-medium text-slate-600">Keperluan / Permohonan Untuk</label>
-            <input type="text" id="sKeperluan" required placeholder="Contoh: Pengurusan Pembuatan KTP Hilang / Syarat Nikah" class="w-full mt-1 px-3.5 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-[#1B4332]" />
+            <label class="text-xs font-semibold text-slate-700">Keperluan / Permohonan Untuk</label>
+            <input type="text" id="sKeperluan" required placeholder="Contoh: Pengurusan Pembuatan KTP Hilang / Syarat Nikah" class="w-full mt-1 px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50/50 focus:outline-none focus:border-blue-600" />
           </div>
           <div class="sm:col-span-2 pt-2">
-            <button type="submit" id="btnKirimSurat" class="w-full bg-[#1B4332] hover:bg-[#143326] text-white text-sm font-medium py-2.5 rounded-xl transition shadow-sm">
+            <button type="submit" id="btnKirimSurat" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl transition shadow-xs">
               Kirim Pengajuan Surat ke Admin RT
             </button>
           </div>
@@ -104,33 +104,33 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
       <!-- Riwayat & Review Surat -->
-      <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 overflow-hidden shadow-xs">
-        <div class="p-5 border-b border-slate-100">
+      <div class="lg:col-span-2 bg-white rounded-2xl border border-blue-100 overflow-hidden shadow-xs">
+        <div class="p-5 border-b border-slate-100 bg-slate-50/50">
           <h3 class="font-heading font-bold text-sm text-slate-900">Riwayat & Review Pengajuan Surat Saya</h3>
         </div>
         <div id="listSuratWarga" class="divide-y divide-slate-100 text-sm">
-          <div class="p-5 text-xs text-slate-400 text-center">Memuat riwayat surat...</div>
+          <div class="p-6 text-xs text-slate-400 text-center">Memuat riwayat surat...</div>
         </div>
       </div>
 
       <!-- Pengumuman & Alur Kas -->
       <div class="space-y-6">
         <!-- Pengumuman Lingkungan -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-3 shadow-xs">
+        <div class="bg-white rounded-2xl border border-blue-100 p-5 space-y-3 shadow-xs">
           <h3 class="font-heading font-bold text-sm text-slate-900 flex items-center gap-2">
             📢 Pengumuman Lingkungan
           </h3>
-          <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 text-xs space-y-1">
-            <span class="font-semibold text-[#1B4332] block">Kerja Bakti Bulanan RT 04</span>
-            <p class="text-slate-600 leading-relaxed">Diharapkan kehadiran seluruh warga pada hari Minggu pukul 07.00 WIB di Taman Blok Mawar untuk kerja bakti membersihkan saluran air.</p>
+          <div class="p-3.5 bg-blue-50/60 rounded-xl border border-blue-100 text-xs space-y-1">
+            <span class="font-bold text-blue-900 block">Kerja Bakti Bulanan RT 04</span>
+            <p class="text-slate-600 leading-relaxed">Diharapkan kehadiran seluruh warga pada hari Minggu pukul 07.00 WIB di Taman Blok Mawar untuk kerja bakti membersihkan lingkungan.</p>
           </div>
         </div>
 
         <!-- Alur Kas & Iuran Terbaru -->
-        <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-3 shadow-xs">
+        <div class="bg-white rounded-2xl border border-blue-100 p-5 space-y-3 shadow-xs">
           <h3 class="font-heading font-bold text-sm text-slate-900">Alur Kas & Kuitansi Warga</h3>
           <div id="listAlurKasWarga" class="divide-y divide-slate-100 text-xs space-y-2">
-            <div class="text-slate-400 text-center py-2">Memuat data kas...</div>
+            <div class="text-slate-400 text-center py-3">Memuat data kas...</div>
           </div>
         </div>
       </div>
@@ -139,7 +139,7 @@
 
   </main>
 
-  <footer class="border-t border-slate-200/70 bg-white py-6 text-center text-xs text-slate-400 no-print">
+  <footer class="border-t border-blue-100 bg-white py-6 text-center text-xs text-slate-500 no-print">
     © 2026 Smart RT — Portal Warga
   </footer>
 
@@ -161,18 +161,18 @@
       const containerKas = document.getElementById('listAlurKasWarga');
       if (kasList && kasList.length > 0) {
         containerKas.innerHTML = kasList.slice(0, 5).map(k => `
-          <div class="flex justify-between items-center py-1.5">
+          <div class="flex justify-between items-center py-2">
             <div>
               <span class="font-medium text-slate-800 block">${k.judul}</span>
-              <span class="text-[10px] text-slate-400">${k.kategori || 'Kas Umum'}</span>
+              <span class="text-[10px] text-slate-400 font-medium">${k.kategori || 'Kas Umum'}</span>
             </div>
-            <span class="font-semibold ${k.tipe === 'pemasukan' ? 'text-emerald-600' : 'text-rose-600'}">
+            <span class="font-bold ${k.tipe === 'pemasukan' ? 'text-emerald-600' : 'text-rose-600'}">
               ${k.tipe === 'pemasukan' ? '+' : '-'} Rp ${Number(k.nominal).toLocaleString('id-ID')}
             </span>
           </div>
         `).join('');
       } else {
-        containerKas.innerHTML = `<div class="text-xs text-slate-400 text-center py-2">Belum ada transaksi kas.</div>`;
+        containerKas.innerHTML = `<div class="text-xs text-slate-400 text-center py-3">Belum ada transaksi kas.</div>`;
       }
 
       // 2. Muat Riwayat Surat Warga
@@ -180,22 +180,22 @@
       const containerSurat = document.getElementById('listSuratWarga');
       if (suratList && suratList.length > 0) {
         containerSurat.innerHTML = suratList.map(s => `
-          <div class="p-4 flex items-center justify-between gap-3">
+          <div class="p-4 flex items-center justify-between gap-3 hover:bg-slate-50/50 transition">
             <div>
-              <div class="font-medium text-slate-900">${s.jenis_surat} — <span class="text-slate-600">${s.keperluan}</span></div>
-              <div class="text-xs text-slate-500 mt-0.5">Pemohon: ${s.nama_pemohon} (NIK: ${s.nik})</div>
+              <div class="font-semibold text-slate-900">${s.jenis_surat}</div>
+              <div class="text-xs text-slate-500 mt-0.5">Pemohon: ${s.nama_pemohon} • Keperluan: ${s.keperluan}</div>
             </div>
             <div class="flex items-center gap-2">
-              <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${
-                s.status === 'disetujui' ? 'bg-emerald-50 text-emerald-700' :
-                s.status === 'ditolak' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
+              <span class="px-3 py-1 rounded-full text-xs font-semibold ${
+                s.status === 'disetujui' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                s.status === 'ditolak' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-amber-50 text-amber-700 border border-amber-200'
               }">${s.status.toUpperCase()}</span>
-              ${s.status === 'disetujui' ? `<button onclick="window.printSurat('${s.id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition">Cetak Surat</button>` : ''}
+              ${s.status === 'disetujui' ? `<button onclick="window.printSurat('${s.id}')" class="px-3.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-xl transition border border-blue-200">Cetak</button>` : ''}
             </div>
           </div>
         `).join('');
       } else {
-        containerSurat.innerHTML = `<div class="p-6 text-xs text-slate-400 text-center">Belum ada riwayat pengajuan surat.</div>`;
+        containerSurat.innerHTML = `<div class="p-8 text-xs text-slate-400 text-center">Belum ada riwayat pengajuan surat.</div>`;
       }
     }
 
@@ -229,7 +229,7 @@
       btn.disabled = false;
     });
 
-    // Fungsi Cetak Surat Bersih (Hanya terpanggil saat tombol Cetak Surat diklik)
+    // Fungsi Cetak Surat Aman
     window.printSurat = async (id) => {
       const { data: s } = await supabase.from('surat_pengantar').select('*').eq('id', id).single();
       const { data: cfg } = await supabase.from('pengaturan_surat').select('*').single();
