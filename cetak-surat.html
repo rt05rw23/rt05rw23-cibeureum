@@ -3,56 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cetak Surat Pengantar - RT 05 / RW 23</title>
+  <title>Cetak & Register Surat - RT 05 / RW 23</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Library QR Code -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     @media print {
       .no-print { display: none !important; }
-      body { background: white !important; padding: 0 !important; }
-      .kertas-a4 { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+      body { background: white !important; padding: 0 !important; margin: 0 !important; }
+      .kertas-a4 { box-shadow: none !important; border: none !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; padding: 1.5cm 2cm !important; }
     }
     .font-surat { font-family: 'Times New Roman', Times, serif; }
   </style>
 </head>
-<body class="bg-slate-200 py-8 px-4">
+<body class="bg-slate-200 py-6 px-4 text-slate-800">
 
-  <!-- Bar Kontrol -->
-  <div class="no-print max-w-3xl mx-auto mb-6 bg-white p-4 rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-3">
-    <div>
-      <p class="text-sm font-bold text-slate-800">Pratinjau Cetak Surat Pengantar</p>
-      <p class="text-xs text-slate-500">Sentuh teks pada surat jika ingin mengedit sebelum dicetak / simpan PDF.</p>
+  <!-- PANEL KONTROL ATAS (Tidak ikut tercetak) -->
+  <div class="no-print max-w-4xl mx-auto mb-5 space-y-4">
+    
+    <!-- Bar Aksi Utama -->
+    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-sm sm:text-base font-bold text-slate-900">Pengesahan & Cetak Surat Pengantar</h1>
+          <span id="badge-register" class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-700">Belum Teregister</span>
+        </div>
+        <p class="text-xs text-slate-500 mt-0.5">Nomor surat dibuat otomatis. Klik "Sahkan & Cetak" untuk mencatat ke buku register & mengaktifkan QR.</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-toggle-editor" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3.5 py-2.5 rounded-xl transition">
+          Atur Template & Kop
+        </button>
+        <button id="btn-sahkan-cetak" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 rounded-xl shadow-sm transition">
+          Sahkan, Register & Cetak PDF
+        </button>
+        <button onclick="window.close()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-3.5 py-2.5 rounded-xl transition">
+          Tutup
+        </button>
+      </div>
     </div>
-    <div class="flex gap-2">
-      <button onclick="window.close()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-lg">Tutup</button>
-      <button onclick="window.print()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow-sm">
-        Cetak / Simpan PDF
-      </button>
+
+    <!-- PANEL EDITOR TEMPLATE & NOMOR SURAT (Bisa dibuka/tutup) -->
+    <div id="panel-editor" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h2 class="font-bold text-sm text-slate-900">Pengaturan Template Kop, Redaksi & Nomor Surat</h2>
+        <span class="text-xs text-slate-400">Perubahan langsung tampil di pratinjau surat</span>
+      </div>
+
+      <!-- Setting Nomor Surat Dokumen Ini -->
+      <div class="bg-blue-50/70 p-4 rounded-xl border border-blue-100">
+        <label class="block text-xs font-bold text-blue-900 mb-1">Nomor Surat Otomatis (Dokumen Ini)</label>
+        <input type="text" id="in-nomor-surat" class="w-full sm:w-96 px-3 py-2 text-sm bg-white border border-blue-200 rounded-lg font-mono font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-blue-600">
+        <p class="text-[11px] text-blue-700 mt-1">Nomor urut dihitung otomatis berdasarkan arsip tahun berjalan, namun tetap dapat Anda sesuaikan.</p>
+      </div>
+
+      <!-- Setting Kop Surat & Penandatangan (Tersimpan Permanen) -->
+      <div class="grid sm:grid-cols-2 gap-4 text-xs">
+        <div class="space-y-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Kop Baris 1 (RT / RW)</label>
+            <input type="text" id="in-kop1" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Kop Baris 2 (Kelurahan & Kecamatan)</label>
+            <input type="text" id="in-kop2" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Kop Baris 3 (Kota/Kabupaten)</label>
+            <input type="text" id="in-kop3" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Alamat Sekretariat Kop Surat</label>
+            <input type="text" id="in-kop-alamat" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Nama Ketua RT 05</label>
+              <input type="text" id="in-nama-rt" placeholder="Nama lengkap Ketua RT" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+            </div>
+            <div>
+              <label class="block font-semibold text-slate-700 mb-1">Nama Ketua RW 23</label>
+              <input type="text" id="in-nama-rw" placeholder="Nama lengkap Ketua RW" class="w-full px-3 py-2 border border-slate-300 rounded-lg">
+            </div>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Redaksi Pembuka Surat</label>
+            <textarea id="in-pembuka" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg"></textarea>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Redaksi Penutup Surat</label>
+            <textarea id="in-penutup" rows="2" class="w-full px-3 py-2 border border-slate-300 rounded-lg"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-100">
+        <button id="btn-simpan-template" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-xl transition">
+          Simpan Pengaturan Template Permanen
+        </button>
+      </div>
     </div>
+
   </div>
 
-  <!-- Lembar Kertas Surat A4 -->
+  <!-- LEMBAR KERTAS SURAT A4 -->
   <div class="kertas-a4 font-surat max-w-3xl mx-auto bg-white p-10 sm:p-14 shadow-md border border-slate-300 text-black leading-relaxed">
     
     <!-- KOP SURAT -->
     <div class="text-center border-b-4 border-double border-black pb-3 mb-6">
-      <h2 class="text-base font-bold uppercase tracking-wide">Rukun Tetangga 05 / Rukun Warga 23</h2>
-      <h1 class="text-xl font-bold uppercase tracking-wider">Kelurahan Cibeureum Kecamatan Cimahi Selatan</h1>
-      <h3 class="text-base font-bold uppercase">Kota Cimahi</h3>
-      <p class="text-xs italic mt-1">Sekretariat: Lingkungan RT 05 RW 23 Kelurahan Cibeureum, Kota Cimahi</p>
+      <h2 id="out-kop1" class="text-base font-bold uppercase tracking-wide">Rukun Tetangga 05 / Rukun Warga 23</h2>
+      <h1 id="out-kop2" class="text-xl font-bold uppercase tracking-wider">Kelurahan Cibeureum Kecamatan Cimahi Selatan</h1>
+      <h3 id="out-kop3" class="text-base font-bold uppercase">Kota Cimahi</h3>
+      <p id="out-kop-alamat" class="text-xs italic mt-1">Sekretariat: Lingkungan RT 05 RW 23 Kelurahan Cibeureum, Kota Cimahi</p>
     </div>
 
     <!-- JUDUL & NOMOR SURAT -->
     <div class="text-center mb-6">
       <h4 class="text-base font-bold underline uppercase" id="out-jenis-judul">SURAT PENGANTAR</h4>
-      <p class="text-sm" contenteditable="true">Nomor: 001 / SP-RT05 / RW23 / <span id="tahun-surat">2026</span></p>
+      <p class="text-sm mt-0.5">Nomor: <span id="out-nomor" class="font-semibold">Memuat nomor...</span></p>
     </div>
 
-    <!-- PEMBUKA -->
-    <p class="text-sm mb-4 text-justify">
+    <!-- REDAKSI PEMBUKA -->
+    <p id="out-pembuka" class="text-sm mb-4 text-justify">
       Yang bertanda tangan di bawah ini Ketua RT 05 / RW 23 Kelurahan Cibeureum, Kecamatan Cimahi Selatan, Kota Cimahi, dengan ini menerangkan bahwa warga kami:
     </p>
 
-    <!-- BIODATA WARGA LENGKAP -->
+    <!-- BIODATA WARGA -->
     <table class="w-full text-sm mb-5">
       <tr>
         <td class="w-48 py-1 font-semibold">Nama Lengkap</td>
@@ -101,23 +181,31 @@
       </tr>
     </table>
 
-    <!-- PENUTUP -->
-    <p class="text-sm mb-10 text-justify">
-      Demikian surat pengantar ini dibuat dengan sebenarnya dan diberikan kepada yang bersangkutan untuk dapat dipergunakan sebagaimana mestinya dalam pengurusan administrasi kependudukan.
+    <!-- REDAKSI PENUTUP -->
+    <p id="out-penutup" class="text-sm mb-8 text-justify">
+      Demikian surat pengantar ini dibuat dengan sebenarnya dan diberikan kepada yang bersangkutan untuk dapat dipergunakan sebagaimana mestinya.
     </p>
 
-    <!-- TANDA TANGAN -->
-    <div class="grid grid-cols-2 text-sm text-center mt-8">
+    <!-- AREA PENANDATANGAN -->
+    <div class="grid grid-cols-2 text-sm text-center mt-6">
       <div>
         <p class="mb-1">Mengetahui,</p>
         <p class="font-bold mb-20">Ketua RW 23 Kel. Cibeureum</p>
-        <p class="font-bold underline" contenteditable="true">( ........................................ )</p>
+        <p id="out-nama-rw" class="font-bold underline">( ........................................ )</p>
       </div>
       <div>
-        <p class="mb-1" contenteditable="true">Cimahi, <span id="tanggal-hari-ini"></span></p>
+        <p class="mb-1">Cimahi, <span id="tanggal-hari-ini"></span></p>
         <p class="font-bold mb-20">Ketua RT 05 / RW 23</p>
-        <p class="font-bold underline" contenteditable="true">( ........................................ )</p>
+        <p id="out-nama-rt" class="font-bold underline">( ........................................ )</p>
       </div>
+    </div>
+
+    <!-- QR CODE VALIDASI KEASLIAN SURAT (Tengah Bawah Penandatangan) -->
+    <div class="mt-8 pt-4 border-t border-dashed border-slate-300 flex flex-col items-center justify-center text-center">
+      <div id="qrcode" class="p-1.5 bg-white border border-slate-200 rounded"></div>
+      <p class="text-[10px] text-slate-600 mt-1.5 font-sans">
+        Pindai (Scan) QR Code di atas untuk memvalidasi keaslian surat pengantar digital RT 05 / RW 23.
+      </p>
     </div>
 
   </div>
@@ -125,36 +213,195 @@
   <script type="module">
     import { supabase } from './js/config.js';
 
-    const sekarang = new Date();
-    const opsiTanggal = { day: 'numeric', month: 'long', year: 'numeric' };
-    document.getElementById('tanggal-hari-ini').textContent = sekarang.toLocaleDateString('id-ID', opsiTanggal);
-    document.getElementById('tahun-surat').textContent = sekarang.getFullYear();
-
     const params = new URLSearchParams(window.location.search);
     const suratId = params.get('id');
+    const sekarang = new Date();
+    const tahunIni = sekarang.getFullYear();
+    const bulanRomawi = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'][sekarang.getMonth()];
+    const opsiTanggal = { day: 'numeric', month: 'long', year: 'numeric' };
 
-    if (suratId) {
-      const { data, error } = await supabase
-        .from('pengajuan_surat')
-        .select('*')
-        .eq('id', suratId)
-        .single();
+    let nextUrutTerhitung = 1;
 
-      if (data && !error) {
-        document.getElementById('out-nama').textContent = data.nama_pemohon;
-        document.getElementById('out-nokk').textContent = data.no_kk || '-';
-        document.getElementById('out-nik').textContent = data.nik;
-        document.getElementById('out-ttl').textContent = data.ttl || '-';
-        document.getElementById('out-jk').textContent = data.jenis_kelamin || '-';
-        document.getElementById('out-agama').textContent = data.agama || '-';
-        document.getElementById('out-pekerjaan').textContent = data.pekerjaan || '-';
-        document.getElementById('out-alamat').textContent = data.alamat || 'RT 05 / RW 23 Kelurahan Cibeureum';
-        document.getElementById('out-keperluan').textContent = data.keperluan ? `${data.jenis_surat} (${data.keperluan})` : data.jenis_surat;
-        document.getElementById('out-jenis-judul').textContent = `SURAT PENGANTAR ${data.jenis_surat.toUpperCase()}`;
-      } else {
-        alert('Data surat tidak ditemukan.');
+    // Toggle Panel Editor
+    document.getElementById('btn-toggle-editor').addEventListener('click', () => {
+      document.getElementById('panel-editor').classList.toggle('hidden');
+    });
+
+    // Sinkronisasi Live Input Editor ke Pratinjau Surat
+    const bindLive = (inputId, outputId, prefix = '') => {
+      document.getElementById(inputId).addEventListener('input', (e) => {
+        document.getElementById(outputId).textContent = prefix + e.target.value;
+      });
+    };
+    bindLive('in-nomor-surat', 'out-nomor');
+    bindLive('in-kop1', 'out-kop1');
+    bindLive('in-kop2', 'out-kop2');
+    bindLive('in-kop3', 'out-kop3');
+    bindLive('in-kop-alamat', 'out-kop-alamat');
+    bindLive('in-pembuka', 'out-pembuka');
+    bindLive('in-penutup', 'out-penutup');
+    bindLive('in-nama-rt', 'out-nama-rt');
+    bindLive('in-nama-rw', 'out-nama-rw');
+
+    // 1. Muat Pengaturan Template dari Supabase
+    async function loadTemplate() {
+      const { data } = await supabase.from('pengaturan_surat').select('*').eq('id', 'default').single();
+      if (data) {
+        document.getElementById('in-kop1').value = data.kop_baris1 || '';
+        document.getElementById('out-kop1').textContent = data.kop_baris1 || '';
+
+        document.getElementById('in-kop2').value = data.kop_baris2 || '';
+        document.getElementById('out-kop2').textContent = data.kop_baris2 || '';
+
+        document.getElementById('in-kop3').value = data.kop_baris3 || '';
+        document.getElementById('out-kop3').textContent = data.kop_baris3 || '';
+
+        document.getElementById('in-kop-alamat').value = data.kop_alamat || '';
+        document.getElementById('out-kop-alamat').textContent = data.kop_alamat || '';
+
+        document.getElementById('in-pembuka').value = data.redaksi_pembuka || '';
+        document.getElementById('out-pembuka').textContent = data.redaksi_pembuka || '';
+
+        document.getElementById('in-penutup').value = data.redaksi_penutup || '';
+        document.getElementById('out-penutup').textContent = data.redaksi_penutup || '';
+
+        document.getElementById('in-nama-rt').value = data.nama_rt || '';
+        document.getElementById('out-nama-rt').textContent = data.nama_rt || '( ........................................ )';
+
+        document.getElementById('in-nama-rw').value = data.nama_rw || '';
+        document.getElementById('out-nama-rw').textContent = data.nama_rw || '( ........................................ )';
       }
     }
+
+    // Simpan Pengaturan Template Permanen
+    document.getElementById('btn-simpan-template').addEventListener('click', async () => {
+      const btn = document.getElementById('btn-simpan-template');
+      btn.textContent = 'Menyimpan...';
+      btn.disabled = true;
+
+      const payload = {
+        id: 'default',
+        kop_baris1: document.getElementById('in-kop1').value,
+        kop_baris2: document.getElementById('in-kop2').value,
+        kop_baris3: document.getElementById('in-kop3').value,
+        kop_alamat: document.getElementById('in-kop-alamat').value,
+        redaksi_pembuka: document.getElementById('in-pembuka').value,
+        redaksi_penutup: document.getElementById('in-penutup').value,
+        nama_rt: document.getElementById('in-nama-rt').value,
+        nama_rw: document.getElementById('in-nama-rw').value,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase.from('pengaturan_surat').upsert([payload]);
+      if (error) alert('Gagal menyimpan template: ' + error.message);
+      else alert('Pengaturan template kop, redaksi, dan nama RT/RW berhasil disimpan permanen!');
+
+      btn.textContent = 'Simpan Pengaturan Template Permanen';
+      btn.disabled = false;
+    });
+
+    // 2. Muat Data Pemohon & Hitung Nomor Otomatis
+    async function loadSuratData() {
+      if (!suratId) return;
+
+      const { data, error } = await supabase.from('pengajuan_surat').select('*').eq('id', suratId).single();
+      if (error || !data) {
+        alert('Data surat tidak ditemukan!');
+        return;
+      }
+
+      document.getElementById('out-nama').textContent = data.nama_pemohon;
+      document.getElementById('out-nokk').textContent = data.no_kk || '-';
+      document.getElementById('out-nik').textContent = data.nik;
+      document.getElementById('out-ttl').textContent = data.ttl || '-';
+      document.getElementById('out-jk').textContent = data.jenis_kelamin || '-';
+      document.getElementById('out-agama').textContent = data.agama || '-';
+      document.getElementById('out-pekerjaan').textContent = data.pekerjaan || '-';
+      document.getElementById('out-alamat').textContent = data.alamat || 'RT 05 / RW 23 Kelurahan Cibeureum';
+      document.getElementById('out-keperluan').textContent = data.keperluan ? `${data.jenis_surat} (${data.keperluan})` : data.jenis_surat;
+      document.getElementById('out-jenis-judul').textContent = `SURAT PENGANTAR ${data.jenis_surat.toUpperCase()}`;
+
+      // Cek apakah sudah pernah punya nomor surat & teregister
+      if (data.nomor_surat && data.teregister) {
+        document.getElementById('in-nomor-surat').value = data.nomor_surat;
+        document.getElementById('out-nomor').textContent = data.nomor_surat;
+        nextUrutTerhitung = data.nomor_urut || 1;
+
+        const tglSah = data.tgl_ttd ? new Date(data.tgl_ttd) : sekarang;
+        document.getElementById('tanggal-hari-ini').textContent = tglSah.toLocaleDateString('id-ID', opsiTanggal);
+
+        const badge = document.getElementById('badge-register');
+        badge.textContent = 'Sudah Teregister';
+        badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700';
+      } else {
+        // Hitung nomor urut otomatis berikutnya di tahun berjalan
+        document.getElementById('tanggal-hari-ini').textContent = sekarang.toLocaleDateString('id-ID', opsiTanggal);
+        
+        const { data: maxData } = await supabase
+          .from('pengajuan_surat')
+          .select('nomor_urut')
+          .eq('tahun_surat', tahunIni)
+          .not('nomor_urut', 'is', null)
+          .order('nomor_urut', { ascending: false })
+          .limit(1);
+
+        const lastUrut = (maxData && maxData.length > 0) ? Number(maxData[0].nomor_urut) : 0;
+        nextUrutTerhitung = lastUrut + 1;
+        const padUrut = String(nextUrutTerhitung).padStart(3, '0');
+        const nomorOtomatis = `${padUrut} / SP-RT05 / RW23 / ${bulanRomawi} / ${tahunIni}`;
+
+        document.getElementById('in-nomor-surat').value = nomorOtomatis;
+        document.getElementById('out-nomor').textContent = nomorOtomatis;
+      }
+
+      // Generate QR Code mengarah ke halaman validasi.html
+      const urlValidasi = `${window.location.origin}/validasi.html?id=${suratId}`;
+      document.getElementById('qrcode').innerHTML = '';
+      new QRCode(document.getElementById('qrcode'), {
+        text: urlValidasi,
+        width: 90,
+        height: 90,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    // 3. Tombol Sahkan, Catat ke Buku Register & Cetak PDF
+    document.getElementById('btn-sahkan-cetak').addEventListener('click', async () => {
+      if (!suratId) return;
+
+      const nomorFinal = document.getElementById('in-nomor-surat').value.trim();
+      const waktuTtd = new Date().toISOString();
+
+      // Simpan pengesahan ke database agar tercatat di buku register & valid saat QR di-scan
+      const { error } = await supabase
+        .from('pengajuan_surat')
+        .update({
+          nomor_urut: nextUrutTerhitung,
+          tahun_surat: tahunIni,
+          nomor_surat: nomorFinal,
+          tgl_ttd: waktuTtd,
+          teregister: true,
+          status: 'Selesai'
+        })
+        .eq('id', suratId);
+
+      if (error) {
+        alert('Gagal mencatat pengesahan ke database: ' + error.message);
+        return;
+      }
+
+      const badge = document.getElementById('badge-register');
+      badge.textContent = 'Sudah Teregister';
+      badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700';
+
+      // Jalankan dialog cetak / simpan PDF
+      window.print();
+    });
+
+    await loadTemplate();
+    await loadSuratData();
   </script>
 </body>
 </html>
