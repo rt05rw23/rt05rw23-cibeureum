@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Warga — Smart RT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #FAFAFA; color: #1E293B; }
+    h1, h2, h3, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+    @media print { body { background: white; } no-print { display: none; } }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- Topbar -->
+  <header class="bg-white border-b border-slate-200/85 sticky top-0 z-30 no-print">
+    <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-[#1B4332] text-white flex items-center justify-center font-heading font-bold text-sm">RT</div>
+        <div>
+          <span id="userName" class="font-heading font-bold text-sm text-slate-900 block leading-none">Memuat...</span>
+          <span class="text-[11px] text-[#1B4332] font-medium uppercase tracking-wider">Dashboard Warga</span>
+        </div>
+      </div>
+      <button id="logoutBtn" class="text-xs font-medium text-slate-500 hover:text-rose-600 px-3 py-1.5 rounded-lg border border-slate-200 transition">
+        Keluar
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-8 space-y-8">
+    <!-- Banner Verifikasi -->
+    <div id="bannerVerifikasi" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+      ⚠️ Akun Anda masih <strong>Pending (Menunggu Verifikasi Pengurus)</strong>. Tombol pengajuan surat dikunci sementara.
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <!-- Saldo Kas RT -->
+      <div class="bg-[#1B4332] text-white p-6 rounded-2xl flex flex-col justify-between">
+        <div>
+          <span class="text-xs text-emerald-200/80 uppercase">Saldo Kas RT Terkini</span>
+          <div id="wargaSaldoKas" class="text-3xl font-heading font-bold mt-1">Rp 0</div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/15 text-xs text-emerald-200">
+          Transparansi Alur Kas Iuran Warga
+        </div>
+      </div>
+
+      <!-- Form Pengajuan Surat -->
+      <div class="md:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/80">
+        <h2 class="font-heading font-bold text-base text-slate-900 mb-3">Ajukan Surat Pengantar</h2>
+        <form id="formSurat" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-500">Jenis Surat</label>
+            <select id="sJenis" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white">
+              <option value="Surat Pengantar KTP / KK">Surat Pengantar KTP / KK</option>
+              <option value="Surat Keterangan Domisili">Surat Keterangan Domisili</option>
+              <option value="Surat Pengantar SKCK">Surat Pengantar SKCK</option>
+              <option value="Surat Keterangan Usaha">Surat Keterangan Usaha (SKU)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Nama Sesuai KTP</label>
+            <input type="text" id="sNama" required class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">NIK</label>
+            <input type="text" id="sNik" required class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Nomor KK</label>
+            <input type="text" id="sNoKk" required class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm" />
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Jenis Kelamin</label>
+            <select id="sJk" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm bg-white">
+              <option value="Laki-laki">Laki-laki</option>
+              <option value="Perempuan">Perempuan</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-slate-500">Pekerjaan Sesuai KTP</label>
+            <input type="text" id="sPekerjaan" required class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="text-xs text-slate-500">Keperluan / Permohonan Untuk</label>
+            <input type="text" id="sKeperluan" required placeholder="Contoh: Pengurusan Pembuatan KTP Hilang" class="w-full mt-1 px-3 py-2 rounded-xl border border-slate-200 text-sm" />
+          </div>
+          <div class="sm:col-span-2 pt-2">
+            <button type="submit" id="btnKirimSurat" class="w-full bg-[#1B4332] text-white text-sm font-medium py-2.5 rounded-xl hover:bg-[#143326] transition">
+              Kirim Pengajuan Surat
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Riwayat & Review Surat Warga -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 overflow-hidden">
+      <div class="p-5 border-b border-slate-100">
+        <h3 class="font-heading font-bold text-sm text-slate-900">Riwayat & Review Pengajuan Surat Saya</h3>
+      </div>
+      <div id="listSuratWarga" class="divide-y divide-slate-100 text-sm"></div>
+    </div>
+
+    <!-- Alur Kas & Pengumuman -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-4">
+        <h3 class="font-heading font-bold text-sm text-slate-900">Alur & Transparansi Kas RT</h3>
+        <div id="listAlurKasWarga" class="divide-y divide-slate-100 text-xs space-y-2"></div>
+      </div>
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-3">
+        <h3 class="font-heading font-bold text-sm text-slate-900">Pengumuman Lingkungan</h3>
+        <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 text-xs space-y-1">
+          <span class="font-semibold text-[#1B4332] block">Kerja Bakti Bulanan</span>
+          <p class="text-slate-600">Minggu ini pukul 07.00 WIB di Taman Blok Mawar. Diharapkan kehadiran seluruh warga.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { supabase } from './js/config.js';
+    import { checkAuthAndRedirect, setupLogout } from './js/app.js';
+
+    async function initWarga() {
+      const auth = await checkAuthAndRedirect('warga');
+      if (!auth) return;
+      setupLogout();
+
+      document.getElementById('userName').textContent = auth.profile.nama_lengkap;
+      if (auth.profile.status_validasi !== 'verified') {
+        document.getElementById('bannerVerifikasi').classList.remove('hidden');
+        const btn = document.getElementById('btnKirimSurat');
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+
+      loadData(auth.user.id);
+    }
+
+    async function loadData(userId) {
+      const { data: kas } = await supabase.from('kas_rt').select('nominal, tipe');
+      const total = (kas || []).reduce((acc, i) => i.tipe === 'pemasukan' ? acc + Number(i.nominal) : acc - Number(i.nominal), 0);
+      document.getElementById('wargaSaldoKas').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+
+      const { data: surat } = await supabase.from('surat_pengantar').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+      document.getElementById('listSuratWarga').innerHTML = (surat?.length ? surat : []).map(s => `
+        <div class="p-4 flex items-center justify-between">
+          <div>
+            <div class="font-medium text-slate-900">${s.jenis_surat} — ${s.keperluan}</div>
+            <div class="text-xs text-slate-500">Pemohon: ${s.nama_pemohon} (NIK: ${s.nik})</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${
+              s.status === 'disetujui' ? 'bg-emerald-50 text-emerald-700' :
+              s.status === 'ditolak' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'
+            }">${s.status.toUpperCase()}</span>
+            ${s.status === 'disetujui' ? `<button onclick="window.printSurat('${s.id}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded-lg">Cetak</button>` : ''}
+          </div>
+        </div>
+      `).join('') || '<div class="p-5 text-xs text-slate-400">Belum ada pengajuan surat.</div>';
+
+      const { data: allKas } = await supabase.from('kas_rt').select('*').order('created_at', { ascending: false }).limit(5);
+      document.getElementById('listAlurKasWarga').innerHTML = (allKas || []).map(k => `
+        <div class="flex justify-between items-center py-1.5">
+          <div>
+            <span class="font-medium text-slate-800 block">${k.judul}</span>
+            <span class="text-[10px] text-slate-400">${k.kategori || 'Umum'}</span>
+          </div>
+          <span class="font-semibold ${k.tipe === 'pemasukan' ? 'text-emerald-600' : 'text-rose-600'}">
+            ${k.tipe === 'pemasukan' ? '+' : '-'} Rp ${Number(k.nominal).toLocaleString('id-ID')}
+          </span>
+        </div>
+      `).join('') || '<div class="text-xs text-slate-400">Belum ada transaksi kas.</div>';
+    }
+
+    document.getElementById('formSurat').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('surat_pengantar').insert({
+        user_id: user.id,
+        jenis_surat: document.getElementById('sJenis').value,
+        nama_pemohon: document.getElementById('sNama').value,
+        nik: document.getElementById('sNik').value,
+        no_kk: document.getElementById('sNoKk').value,
+        jenis_kelamin: document.getElementById('sJk').value,
+        pekerjaan: document.getElementById('sPekerjaan').value,
+        keperluan: document.getElementById('sKeperluan').value
+      });
+      e.target.reset();
+      loadData(user.id);
+      alert('Pengajuan surat berhasil dikirim!');
+    });
+
+    window.printSurat = async (id) => {
+      const { data: s } = await supabase.from('surat_pengantar').select('*').eq('id', id).single();
+      const { data: cfg } = await supabase.from('pengaturan_surat').select('*').single();
+      
+      const printWindow = window.open('', '_print', 'width=800,height=600');
+      printWindow.document.write(`
+        <html><head><title>Cetak Surat</title><script src="https://cdn.tailwindcss.com"></script></head>
+        <body class="p-10 font-sans text-slate-900 bg-white">
+          <div class="text-center border-b-2 border-slate-900 pb-4 mb-6">
+            <h3 class="font-bold text-sm">${cfg?.kop_baris_1 || ''}</h3>
+            <h4 class="font-bold text-xs uppercase">${cfg?.kop_baris_2 || ''}</h4>
+            <h2 class="font-bold text-base mt-1">${cfg?.kop_baris_3 || ''}</h2>
+            <p class="text-[11px] text-slate-600">${cfg?.alamat_sekretariat || ''}</p>
+          </div>
+          <div class="text-center my-6">
+            <h1 class="font-bold text-lg uppercase underline">${s.jenis_surat}</h1>
+            <p class="text-xs text-slate-500 mt-1">Nomor: 04/RT-09/VI/2026</p>
+          </div>
+          <p class="text-sm mb-4">Yang bertanda tangan di bawah ini Ketua RT 04 / RW 09 Kelurahan Cibeureum, menerangkan bahwa:</p>
+          <table class="text-sm space-y-2 mb-6 ml-4">
+            <tr><td class="w-48 font-medium">Nama Lengkap</td><td>: ${s.nama_pemohon}</td></tr>
+            <tr><td class="font-medium">NIK / No. KK</td><td>: ${s.nik} / ${s.no_kk}</td></tr>
+            <tr><td class="font-medium">Jenis Kelamin</td><td>: ${s.jenis_kelamin}</td></tr>
+            <tr><td class="font-medium">Pekerjaan</td><td>: ${s.pekerjaan}</td></tr>
+            <tr><td class="font-medium">Keperluan</td><td>: <strong>${s.keperluan}</strong></td></tr>
+          </table>
+          <p class="text-sm mb-8">Demikian surat pengantar ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+          <div class="flex justify-end text-center text-sm">
+            <div><p>Cimahi, ${new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+            <p class="font-bold mt-1">Ketua RT 04</p><div class="h-16"></div>
+            <p class="font-bold underline">${cfg?.nama_ketua_rt || ''}</p></div>
+          </div>
+          <script>window.print();</script>
+        </body></html>
+      `);
+      printWindow.document.close();
+    };
+
+    initWarga();
+  </script>
+</body>
+</html>
