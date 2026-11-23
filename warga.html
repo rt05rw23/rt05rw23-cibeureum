@@ -33,11 +33,6 @@
 
   <main class="max-w-5xl mx-auto px-6 py-8 space-y-8 no-print">
     
-    <!-- Banner Status Akun -->
-    <div id="bannerVerifikasi" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
-      ⚠️ Akun Anda masih <strong>Pending (Menunggu Verifikasi Pengurus)</strong>. Tombol pengajuan surat dikunci sementara.
-    </div>
-
     <!-- GRID ATAS: SALDO KAS & FORM SURAT -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
       
@@ -120,12 +115,12 @@
 
       <!-- Pengumuman & Alur Kas -->
       <div class="space-y-6">
-        <!-- Pengumuman dari Super Admin / Pengurus -->
+        <!-- Pengumuman Lingkungan -->
         <div class="bg-white rounded-2xl border border-slate-200/80 p-5 space-y-3 shadow-xs">
           <h3 class="font-heading font-bold text-sm text-slate-900 flex items-center gap-2">
             📢 Pengumuman Lingkungan
           </h3>
-          <div id="boxPengumuman" class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 text-xs space-y-1">
+          <div class="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100 text-xs space-y-1">
             <span class="font-semibold text-[#1B4332] block">Kerja Bakti Bulanan RT 04</span>
             <p class="text-slate-600 leading-relaxed">Diharapkan kehadiran seluruh warga pada hari Minggu pukul 07.00 WIB di Taman Blok Mawar untuk kerja bakti membersihkan saluran air.</p>
           </div>
@@ -225,7 +220,7 @@
       if (error) {
         alert('Gagal mengirim surat: ' + error.message);
       } else {
-        alert('Pengajuan surat berhasil dikirim! Silakan tunggu verifikasi dari Admin RT.');
+        alert('Pengajuan surat berhasil dikirim! Silakan cek di Panel Admin.');
         e.target.reset();
         initWarga();
       }
@@ -234,7 +229,7 @@
       btn.disabled = false;
     });
 
-    // Fungsi Cetak Surat Bersih & Aman
+    // Fungsi Cetak Surat Aman
     window.printSurat = async (id) => {
       const { data: s } = await supabase.from('surat_pengantar').select('*').eq('id', id).single();
       const { data: cfg } = await supabase.from('pengaturan_surat').select('*').single();
