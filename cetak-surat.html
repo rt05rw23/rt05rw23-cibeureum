@@ -44,7 +44,7 @@
       </div>
     </div>
 
-    <!-- PANEL EDITOR TEMPLATE & NOMOR SURAT (Bisa dibuka/tutup) -->
+    <!-- PANEL EDITOR TEMPLATE & NOMOR SURAT -->
     <div id="panel-editor" class="hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h2 class="font-bold text-sm text-slate-900">Pengaturan Template Kop, Redaksi & Nomor Surat</h2>
@@ -58,7 +58,7 @@
         <p class="text-[11px] text-blue-700 mt-1">Nomor urut dihitung otomatis berdasarkan arsip tahun berjalan, namun tetap dapat Anda sesuaikan.</p>
       </div>
 
-      <!-- Setting Kop Surat & Penandatangan (Tersimpan Permanen) -->
+      <!-- Setting Kop Surat & Penandatangan -->
       <div class="grid sm:grid-cols-2 gap-4 text-xs">
         <div class="space-y-3">
           <div>
@@ -121,9 +121,9 @@
       <p id="out-kop-alamat" class="text-xs italic mt-1">Sekretariat: Lingkungan RT 05 RW 23 Kelurahan Cibeureum, Kota Cimahi</p>
     </div>
 
-    <!-- JUDUL & NOMOR SURAT -->
+    <!-- JUDUL & NOMOR SURAT (Konsisten: SURAT PENGANTAR) -->
     <div class="text-center mb-6">
-      <h4 class="text-base font-bold underline uppercase" id="out-jenis-judul">SURAT PENGANTAR</h4>
+      <h4 class="text-base font-bold underline uppercase">SURAT PENGANTAR</h4>
       <p class="text-sm mt-0.5">Nomor: <span id="out-nomor" class="font-semibold">Memuat nomor...</span></p>
     </div>
 
@@ -175,6 +175,11 @@
         <td class="py-1" id="out-alamat" contenteditable="true">-</td>
       </tr>
       <tr>
+        <td class="py-1 font-semibold align-top">Pengantar Untuk</td>
+        <td class="py-1 font-semibold align-top">:</td>
+        <td class="py-1 font-bold" id="out-jenis" contenteditable="true">-</td>
+      </tr>
+      <tr>
         <td class="py-1 font-semibold align-top">Keperluan / Maksud</td>
         <td class="py-1 font-semibold align-top">:</td>
         <td class="py-1" id="out-keperluan" contenteditable="true">-</td>
@@ -200,7 +205,7 @@
       </div>
     </div>
 
-    <!-- QR CODE VALIDASI KEASLIAN SURAT (Tengah Bawah Penandatangan) -->
+    <!-- QR CODE VALIDASI KEASLIAN SURAT -->
     <div class="mt-8 pt-4 border-t border-dashed border-slate-300 flex flex-col items-center justify-center text-center">
       <div id="qrcode" class="p-1.5 bg-white border border-slate-200 rounded"></div>
       <p class="text-[10px] text-slate-600 mt-1.5 font-sans">
@@ -222,12 +227,10 @@
 
     let nextUrutTerhitung = 1;
 
-    // Toggle Panel Editor
     document.getElementById('btn-toggle-editor').addEventListener('click', () => {
       document.getElementById('panel-editor').classList.toggle('hidden');
     });
 
-    // Sinkronisasi Live Input Editor ke Pratinjau Surat
     const bindLive = (inputId, outputId, prefix = '') => {
       document.getElementById(inputId).addEventListener('input', (e) => {
         document.getElementById(outputId).textContent = prefix + e.target.value;
@@ -243,7 +246,6 @@
     bindLive('in-nama-rt', 'out-nama-rt');
     bindLive('in-nama-rw', 'out-nama-rw');
 
-    // 1. Muat Pengaturan Template dari Supabase
     async function loadTemplate() {
       const { data } = await supabase.from('pengaturan_surat').select('*').eq('id', 'default').single();
       if (data) {
@@ -273,7 +275,6 @@
       }
     }
 
-    // Simpan Pengaturan Template Permanen
     document.getElementById('btn-simpan-template').addEventListener('click', async () => {
       const btn = document.getElementById('btn-simpan-template');
       btn.textContent = 'Menyimpan...';
@@ -300,7 +301,6 @@
       btn.disabled = false;
     });
 
-    // 2. Muat Data Pemohon & Hitung Nomor Otomatis
     async function loadSuratData() {
       if (!suratId) return;
 
@@ -318,10 +318,9 @@
       document.getElementById('out-agama').textContent = data.agama || '-';
       document.getElementById('out-pekerjaan').textContent = data.pekerjaan || '-';
       document.getElementById('out-alamat').textContent = data.alamat || 'RT 05 / RW 23 Kelurahan Cibeureum';
-      document.getElementById('out-keperluan').textContent = data.keperluan ? `${data.jenis_surat} (${data.keperluan})` : data.jenis_surat;
-      document.getElementById('out-jenis-judul').textContent = `SURAT PENGANTAR ${data.jenis_surat.toUpperCase()}`;
+      document.getElementById('out-jenis').textContent = data.jenis_surat;
+      document.getElementById('out-keperluan').textContent = data.keperluan || 'Pengurusan administrasi kependudukan';
 
-      // Cek apakah sudah pernah punya nomor surat & teregister
       if (data.nomor_surat && data.teregister) {
         document.getElementById('in-nomor-surat').value = data.nomor_surat;
         document.getElementById('out-nomor').textContent = data.nomor_surat;
@@ -334,7 +333,6 @@
         badge.textContent = 'Sudah Teregister';
         badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700';
       } else {
-        // Hitung nomor urut otomatis berikutnya di tahun berjalan
         document.getElementById('tanggal-hari-ini').textContent = sekarang.toLocaleDateString('id-ID', opsiTanggal);
         
         const { data: maxData } = await supabase
@@ -354,7 +352,6 @@
         document.getElementById('out-nomor').textContent = nomorOtomatis;
       }
 
-      // Generate QR Code mengarah ke halaman validasi.html
       const urlValidasi = `${window.location.origin}/validasi.html?id=${suratId}`;
       document.getElementById('qrcode').innerHTML = '';
       new QRCode(document.getElementById('qrcode'), {
@@ -367,14 +364,12 @@
       });
     }
 
-    // 3. Tombol Sahkan, Catat ke Buku Register & Cetak PDF
     document.getElementById('btn-sahkan-cetak').addEventListener('click', async () => {
       if (!suratId) return;
 
       const nomorFinal = document.getElementById('in-nomor-surat').value.trim();
       const waktuTtd = new Date().toISOString();
 
-      // Simpan pengesahan ke database agar tercatat di buku register & valid saat QR di-scan
       const { error } = await supabase
         .from('pengajuan_surat')
         .update({
@@ -396,7 +391,6 @@
       badge.textContent = 'Sudah Teregister';
       badge.className = 'text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700';
 
-      // Jalankan dialog cetak / simpan PDF
       window.print();
     });
 
