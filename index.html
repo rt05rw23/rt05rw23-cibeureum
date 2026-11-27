@@ -5,9 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Resmi RT 05 / RW 23 - Kelurahan Cibeureum</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Library QR Code & html2pdf untuk unduh PDF otomatis -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    /* Styling khusus saat mencetak/mengunduh PDF surat */
+    @media print {
+      body * { visibility: hidden; }
+      #surat-modal, #surat-modal * { visibility: visible; }
+      #surat-modal { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 1cm; background: white; }
+    }
+    .font-surat { font-family: 'Times New Roman', Times, serif; }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased">
@@ -157,14 +167,13 @@
         </form>
       </div>
 
-      <!-- Status Pengajuan Terbaru & Fitur Pencarian & Konfirmasi NIK -->
+      <!-- Status Pengajuan Terbaru & Fitur Pencarian & Konfirmasi NIK Unduh PDF -->
       <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 class="text-xl font-bold text-slate-900">Pantau Status Pengajuan</h3>
             <p class="text-xs text-slate-500">Cari nama Anda dan unduh surat jika sudah selesai</p>
           </div>
-          <!-- Kolom Pencarian -->
           <div>
             <input type="text" id="search-surat" placeholder="Cari nama / jenis surat..." class="w-full sm:w-56 px-3 py-2 text-xs border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
           </div>
@@ -257,14 +266,69 @@
     <p>&copy; 2026 Kepengurusan RT 05 / RW 23 Kelurahan Cibeureum. Dikelola secara digital untuk warga.</p>
   </footer>
 
-  <!-- Script Integrasi Supabase & Fitur Keamanan NIK -->
+  <!-- TEMPLATE SURAT TERSEMBUNYI (Digunakan otomatis untuk di-generate jadi PDF oleh html2pdf) -->
+  <div id="surat-modal" style="display:none; width: 210mm; background: white; padding: 20mm; color: black;" class="font-surat">
+    <div style="text-align: center; border-bottom: 4px double black; padding-bottom: 12px; margin-bottom: 24px;">
+      <h2 id="p-kop1" style="font-size: 14pt; font-weight: bold; text-transform: uppercase;">Rukun Tetangga 05 / Rukun Warga 23</h2>
+      <h1 id="p-kop2" style="font-size: 16pt; font-weight: bold; text-transform: uppercase;">Kelurahan Cibeureum Kecamatan Cimahi Selatan</h1>
+      <h3 id="p-kop3" style="font-size: 14pt; font-weight: bold; text-transform: uppercase;">Kota Cimahi</h3>
+      <p id="p-kop-alamat" style="font-size: 10pt; font-style: italic; margin-top: 4px;">Sekretariat: Lingkungan RT 05 RW 23 Kelurahan Cibeureum, Kota Cimahi</p>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 24px;">
+      <h4 style="font-size: 14pt; font-weight: bold; text-decoration: underline; text-transform: uppercase;">SURAT PENGANTAR</h4>
+      <p style="font-size: 11pt; margin-top: 4px;">Nomor: <span id="p-nomor">...</span></p>
+    </div>
+
+    <p id="p-pembuka" style="font-size: 11pt; margin-bottom: 16px; text-align: justify; line-height: 1.5;">
+      Yang bertanda tangan di bawah ini Ketua RT 05 / RW 23 Kelurahan Cibeureum, Kecamatan Cimahi Selatan, Kota Cimahi, dengan ini menerangkan bahwa warga kami:
+    </p>
+
+    <table style="width: 100%; font-size: 11pt; margin-bottom: 20px; border-collapse: collapse; line-height: 1.6;">
+      <tr><td style="width: 35%; font-weight: bold;">Nama Lengkap</td><td style="width: 5%;">:</td><td id="p-nama" style="width: 60%; font-weight: bold; text-transform: uppercase;">-</td></tr>
+      <tr><td style="font-weight: bold;">No. Kartu Keluarga (KK)</td><td>:</td><td id="p-nokk">-</td></tr>
+      <tr><td style="font-weight: bold;">NIK</td><td>:</td><td id="p-nik">-</td></tr>
+      <tr><td style="font-weight: bold;">Tempat, Tanggal Lahir</td><td>:</td><td id="p-ttl">-</td></tr>
+      <tr><td style="font-weight: bold;">Jenis Kelamin</td><td>:</td><td id="p-jk">-</td></tr>
+      <tr><td style="font-weight: bold;">Agama</td><td>:</td><td id="p-agama">-</td></tr>
+      <tr><td style="font-weight: bold;">Pekerjaan</td><td>:</td><td id="p-pekerjaan">-</td></tr>
+      <tr><td style="font-weight: bold; vertical-align: top;">Alamat</td><td style="vertical-align: top;">:</td><td id="p-alamat">-</td></tr>
+      <tr><td style="font-weight: bold; vertical-align: top;">Pengantar Untuk</td><td style="vertical-align: top;">:</td><td id="p-jenis" style="font-weight: bold;">-</td></tr>
+      <tr><td style="font-weight: bold; vertical-align: top;">Keperluan / Maksud</td><td style="vertical-align: top;">:</td><td id="p-keperluan">-</td></tr>
+    </table>
+
+    <p id="p-penutup" style="font-size: 11pt; margin-bottom: 30px; text-align: justify; line-height: 1.5;">
+      Demikian surat pengantar ini dibuat dengan sebenarnya dan diberikan kepada yang bersangkutan untuk dapat dipergunakan sebagaimana mestinya.
+    </p>
+
+    <div style="display: flex; justify-content: space-between; font-size: 11pt; text-align: center; margin-top: 20px;">
+      <div style="width: 40%;">
+        <p>Mengetahui,</p>
+        <p style="font-weight: bold; margin-bottom: 60px;">Ketua RW 23 Kel. Cibeureum</p>
+        <p id="p-namarw" style="font-weight: bold; text-decoration: underline;">( ........................................ )</p>
+      </div>
+      <div style="width: 40%;">
+        <p>Cimahi, <span id="p-tglttd">...</span></p>
+        <p style="font-weight: bold; margin-bottom: 60px;">Ketua RT 05 / RW 23</p>
+        <p id="p-namart" style="font-weight: bold; text-decoration: underline;">( ........................................ )</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 30px; padding-top: 15px; border-top: 1px dashed #94a3b8; display: flex; flex-direction: column; align-items: center; text-align: center;">
+      <div id="p-qrcode" style="padding: 4px; background: white; border: 1px solid #cbd5e1; border-radius: 4px;"></div>
+      <p style="font-size: 8pt; color: #64748b; margin-top: 6px; font-family: sans-serif;">
+        Pindai (Scan) QR Code di atas untuk memvalidasi keaslian surat pengantar digital RT 05 / RW 23.
+      </p>
+    </div>
+  </div>
+
+  <!-- Script Integrasi Supabase & Unduh PDF Otomatis -->
   <script type="module">
     import { supabase } from './js/config.js';
 
     let allSuratData = [];
     const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
 
-    // 1. Muat Pengumuman
     async function loadPengumuman() {
       const container = document.getElementById('list-pengumuman');
       const { data, error } = await supabase.from('pengumuman').select('*').order('created_at', { ascending: false }).limit(6);
@@ -286,7 +350,6 @@
       `).join('');
     }
 
-    // 2. Muat Kas RT
     async function loadKas() {
       const tbody = document.getElementById('tabel-kas');
       const { data, error } = await supabase.from('kas_rt').select('*').order('tanggal', { ascending: false });
@@ -318,7 +381,6 @@
       `).join('');
     }
 
-    // 3. Muat Status Surat & Render Tabel dengan Tombol Unduh Berkeamanan NIK
     async function loadSurat(keyword = '') {
       const tbody = document.getElementById('tabel-surat');
       
@@ -344,7 +406,7 @@
       tbody.innerHTML = filtered.slice(0, 10).map(s => {
         let aksiBtn = `<span class="text-xs text-slate-400 italic">Belum tersedia</span>`;
         if (s.status === 'Selesai' && s.teregister) {
-          aksiBtn = `<button onclick="konfirmasiUnduh('${s.id}', '${s.nama_pemohon}')" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg shadow-sm transition">Unduh PDF</button>`;
+          aksiBtn = `<button onclick="prosesUnduhPDF('${s.id}', '${s.nama_pemohon}')" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg shadow-sm transition">Unduh PDF</button>`;
         } else if (s.status === 'Selesai') {
           aksiBtn = `<span class="text-xs text-amber-600 font-medium">Menunggu Paraf RT</span>`;
         }
@@ -364,26 +426,82 @@
       }).join('');
     }
 
-    // Mekanisme Konfirmasi NIK Warga sebelum Unduh PDF
-    window.konfirmasiUnduh = function(suratId, namaPemohon) {
+    // Mekanisme Konfirmasi NIK & Unduh PDF Otomatis
+    window.prosesUnduhPDF = async function(suratId, namaPemohon) {
       const inputNik = prompt(`Konfirmasi Keamanan Pemohon\n\nMasukkan 16 digit NIK milik Saudara/i "${namaPemohon}" untuk mengunduh surat pengantar ini:`);
       if (!inputNik) return;
 
       const targetSurat = allSuratData.find(item => item.id === suratId);
-      if (targetSurat && targetSurat.nik.trim() === inputNik.trim()) {
-        alert('NIK Sesuai! Membuka dokumen surat...');
-        window.open(`cetak-surat.html?id=${suratId}`, '_blank');
-      } else {
+      if (!targetSurat || targetSurat.nik.trim() !== inputNik.trim()) {
         alert('Maaf, NIK yang Anda masukkan tidak sesuai dengan data pemohon. Unduhan ditolak.');
+        return;
       }
+
+      alert('NIK Sesuai! Menyiapkan dokumen PDF...');
+
+      // Ambil template pengaturan kop dari database
+      const { data: tpl } = await supabase.from('pengaturan_surat').select('*').eq('id', 'default').single();
+
+      // Isi elemen template tersembunyi
+      if (tpl) {
+        document.getElementById('p-kop1').textContent = tpl.kop_baris1 || '';
+        document.getElementById('p-kop2').textContent = tpl.kop_baris2 || '';
+        document.getElementById('p-kop3').textContent = tpl.kop_baris3 || '';
+        document.getElementById('p-kop-alamat').textContent = tpl.kop_alamat || '';
+        document.getElementById('p-pembuka').textContent = tpl.redaksi_pembuka || '';
+        document.getElementById('p-penutup').textContent = tpl.redaksi_penutup || '';
+        document.getElementById('p-namart').textContent = tpl.nama_rt || '( ........................................ )';
+        document.getElementById('p-namarw').textContent = tpl.nama_rw || '( ........................................ )';
+      }
+
+      document.getElementById('p-nomor').textContent = targetSurat.nomor_surat || '...';
+      document.getElementById('p-nama').textContent = targetSurat.nama_pemohon;
+      document.getElementById('p-nokk').textContent = targetSurat.no_kk || '-';
+      document.getElementById('p-nik').textContent = targetSurat.nik;
+      document.getElementById('p-ttl').textContent = targetSurat.ttl || '-';
+      document.getElementById('p-jk').textContent = targetSurat.jenis_kelamin || '-';
+      document.getElementById('p-agama').textContent = targetSurat.agama || '-';
+      document.getElementById('p-pekerjaan').textContent = targetSurat.pekerjaan || '-';
+      document.getElementById('p-alamat').textContent = targetSurat.alamat || 'RT 05 / RW 23 Kelurahan Cibeureum';
+      document.getElementById('p-jenis').textContent = targetSurat.jenis_surat;
+      document.getElementById('p-keperluan').textContent = targetSurat.keperluan ? `${targetSurat.jenis_surat} (${targetSurat.keperluan})` : targetSurat.jenis_surat;
+
+      const tglSah = targetSurat.tgl_ttd ? new Date(targetSurat.tgl_ttd) : new Date();
+      document.getElementById('p-tglttd').textContent = tglSah.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      // Generate QR Code di template tersembunyi
+      const urlValidasi = `${window.location.origin}/validasi.html?id=${suratId}`;
+      document.getElementById('p-qrcode').innerHTML = '';
+      new QRCode(document.getElementById('p-qrcode'), {
+        text: urlValidasi,
+        width: 80,
+        height: 80,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      // Render dan Unduh PDF menggunakan html2pdf
+      const element = document.getElementById('surat-modal');
+      element.style.display = 'block';
+
+      const opt = {
+        margin:       10,
+        filename:     `Surat_Pengantar_${targetSurat.nama_pemohon.replace(/\s+/g, '_')}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().from(element).set(opt).save().then(() => {
+        element.style.display = 'none';
+      });
     };
 
-    // Event Listener Kotak Pencarian
     document.getElementById('search-surat').addEventListener('input', (e) => {
       loadSurat(e.target.value);
     });
 
-    // 4. Kirim Pengajuan Surat
     document.getElementById('form-surat').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-submit');
@@ -411,7 +529,7 @@
       } else {
         alert('Pengajuan surat berhasil dikirim! Pengurus RT akan segera memprosesnya.');
         e.target.reset();
-        allSuratData = []; // Reset cache agar mengambil data terbaru
+        allSuratData = [];
         loadSurat();
       }
       btn.disabled = false;
