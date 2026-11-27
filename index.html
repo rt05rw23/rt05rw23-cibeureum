@@ -72,7 +72,7 @@
 
     <!-- Section 2: Layanan Surat Pengantar Online -->
     <section id="layanan" class="grid lg:grid-cols-12 gap-8 items-start">
-      <div class="lg:col-span-6 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="lg:col-span-5 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
         <h3 class="text-xl font-bold text-slate-900 mb-2">Pengajuan Surat Pengantar</h3>
         <p class="text-sm text-slate-500 mb-6">Lengkapi data diri di bawah ini dengan benar untuk pembuatan surat pengantar.</p>
         
@@ -96,7 +96,7 @@
           <div class="grid sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">Tempat, Tanggal Lahir</label>
-              <input type="text" id="ttl" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Contoh: Cimahi, 20 Agustus 1999">
+              <input type="text" id="ttl" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Cimahi, 20 Agt 1999">
             </div>
             <div>
               <label class="block text-xs font-semibold text-slate-700 mb-1">No. WhatsApp</label>
@@ -127,12 +127,12 @@
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Pekerjaan</label>
-            <input type="text" id="pekerjaan" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Contoh: Karyawan Swasta / Wiraswasta">
+            <input type="text" id="pekerjaan" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Karyawan Swasta / Wiraswasta">
           </div>
 
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1">Alamat Lengkap di RT 05</label>
-            <textarea id="alamat" rows="2" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none" placeholder="Contoh: Jl. Cibeureum No. 12 RT 05 / RW 23">Jl. Cibeureum RT 05 / RW 23</textarea>
+            <textarea id="alamat" rows="2" required class="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 outline-none">Jl. Cibeureum RT 05 / RW 23</textarea>
           </div>
 
           <div>
@@ -157,10 +157,19 @@
         </form>
       </div>
 
-      <!-- Status Pengajuan Terbaru -->
-      <div class="lg:col-span-6 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="text-xl font-bold text-slate-900 mb-2">Pantau Status Pengajuan</h3>
-        <p class="text-sm text-slate-500 mb-6">Daftar antrean pengajuan surat warga RT 05 / RW 23</p>
+      <!-- Status Pengajuan Terbaru & Fitur Pencarian & Konfirmasi NIK -->
+      <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-xl font-bold text-slate-900">Pantau Status Pengajuan</h3>
+            <p class="text-xs text-slate-500">Cari nama Anda dan unduh surat jika sudah selesai</p>
+          </div>
+          <!-- Kolom Pencarian -->
+          <div>
+            <input type="text" id="search-surat" placeholder="Cari nama / jenis surat..." class="w-full sm:w-56 px-3 py-2 text-xs border border-slate-300 rounded-xl outline-none focus:ring-2 focus:ring-blue-600">
+          </div>
+        </div>
+
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
@@ -168,10 +177,11 @@
                 <th class="py-3 px-2">Pemohon</th>
                 <th class="py-3 px-2">Jenis Surat</th>
                 <th class="py-3 px-2">Status</th>
+                <th class="py-3 px-2 text-right">Aksi PDF</th>
               </tr>
             </thead>
             <tbody id="tabel-surat" class="divide-y divide-slate-100 text-sm">
-              <tr><td colspan="3" class="py-4 text-center text-slate-400 text-xs">Memuat data...</td></tr>
+              <tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">Memuat data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -247,10 +257,11 @@
     <p>&copy; 2026 Kepengurusan RT 05 / RW 23 Kelurahan Cibeureum. Dikelola secara digital untuk warga.</p>
   </footer>
 
-  <!-- Script Integrasi Supabase -->
+  <!-- Script Integrasi Supabase & Fitur Keamanan NIK -->
   <script type="module">
     import { supabase } from './js/config.js';
 
+    let allSuratData = [];
     const formatRupiah = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
 
     // 1. Muat Pengumuman
@@ -307,30 +318,72 @@
       `).join('');
     }
 
-    // 3. Muat Status Surat
-    async function loadSurat() {
+    // 3. Muat Status Surat & Render Tabel dengan Tombol Unduh Berkeamanan NIK
+    async function loadSurat(keyword = '') {
       const tbody = document.getElementById('tabel-surat');
-      const { data, error } = await supabase.from('pengajuan_surat').select('nama_pemohon, jenis_surat, status').order('created_at', { ascending: false }).limit(8);
       
-      if (error || !data || data.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400 text-xs">Belum ada antrean pengajuan surat.</td></tr>`;
+      if (allSuratData.length === 0) {
+        const { data, error } = await supabase.from('pengajuan_surat').select('*').order('created_at', { ascending: false });
+        if (error || !data) {
+          tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">Gagal memuat data.</td></tr>`;
+          return;
+        }
+        allSuratData = data;
+      }
+
+      const filtered = allSuratData.filter(s => 
+        s.nama_pemohon.toLowerCase().includes(keyword.toLowerCase()) || 
+        s.jenis_surat.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400 text-xs">Tidak ada data yang cocok dengan pencarian.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = data.map(s => `
-        <tr>
-          <td class="py-3 px-2 font-medium text-slate-800">${s.nama_pemohon}</td>
-          <td class="py-3 px-2 text-slate-600">${s.jenis_surat}</td>
-          <td class="py-3 px-2">
-            <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${s.status === 'Selesai' ? 'bg-emerald-50 text-emerald-700' : (s.status === 'Diproses' ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700')}">
-              ${s.status}
-            </span>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = filtered.slice(0, 10).map(s => {
+        let aksiBtn = `<span class="text-xs text-slate-400 italic">Belum tersedia</span>`;
+        if (s.status === 'Selesai' && s.teregister) {
+          aksiBtn = `<button onclick="konfirmasiUnduh('${s.id}', '${s.nama_pemohon}')" class="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 rounded-lg shadow-sm transition">Unduh PDF</button>`;
+        } else if (s.status === 'Selesai') {
+          aksiBtn = `<span class="text-xs text-amber-600 font-medium">Menunggu Paraf RT</span>`;
+        }
+
+        return `
+          <tr>
+            <td class="py-3 px-2 font-medium text-slate-800">${s.nama_pemohon}</td>
+            <td class="py-3 px-2 text-slate-600 text-xs">${s.jenis_surat}</td>
+            <td class="py-3 px-2">
+              <span class="text-[11px] font-semibold px-2.5 py-1 rounded-full ${s.status === 'Selesai' ? 'bg-emerald-50 text-emerald-700' : (s.status === 'Diproses' ? 'bg-blue-50 text-blue-700' : 'bg-amber-50 text-amber-700')}">
+                ${s.status}
+              </span>
+            </td>
+            <td class="py-3 px-2 text-right">${aksiBtn}</td>
+          </tr>
+        `;
+      }).join('');
     }
 
-    // 4. Kirim Pengajuan Surat Lengkap
+    // Mekanisme Konfirmasi NIK Warga sebelum Unduh PDF
+    window.konfirmasiUnduh = function(suratId, namaPemohon) {
+      const inputNik = prompt(`Konfirmasi Keamanan Pemohon\n\nMasukkan 16 digit NIK milik Saudara/i "${namaPemohon}" untuk mengunduh surat pengantar ini:`);
+      if (!inputNik) return;
+
+      const targetSurat = allSuratData.find(item => item.id === suratId);
+      if (targetSurat && targetSurat.nik.trim() === inputNik.trim()) {
+        alert('NIK Sesuai! Membuka dokumen surat...');
+        window.open(`cetak-surat.html?id=${suratId}`, '_blank');
+      } else {
+        alert('Maaf, NIK yang Anda masukkan tidak sesuai dengan data pemohon. Unduhan ditolak.');
+      }
+    };
+
+    // Event Listener Kotak Pencarian
+    document.getElementById('search-surat').addEventListener('input', (e) => {
+      loadSurat(e.target.value);
+    });
+
+    // 4. Kirim Pengajuan Surat
     document.getElementById('form-surat').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('btn-submit');
@@ -358,6 +411,7 @@
       } else {
         alert('Pengajuan surat berhasil dikirim! Pengurus RT akan segera memprosesnya.');
         e.target.reset();
+        allSuratData = []; // Reset cache agar mengambil data terbaru
         loadSurat();
       }
       btn.disabled = false;
