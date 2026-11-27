@@ -11,12 +11,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
-    /* Styling khusus saat mencetak/mengunduh PDF surat */
-    @media print {
-      body * { visibility: hidden; }
-      #surat-modal, #surat-modal * { visibility: visible; }
-      #surat-modal { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 1cm; background: white; }
-    }
     .font-surat { font-family: 'Times New Roman', Times, serif; }
   </style>
 </head>
@@ -266,8 +260,8 @@
     <p>&copy; 2026 Kepengurusan RT 05 / RW 23 Kelurahan Cibeureum. Dikelola secara digital untuk warga.</p>
   </footer>
 
-  <!-- TEMPLATE SURAT TERSEMBUNYI (Digunakan otomatis untuk di-generate jadi PDF oleh html2pdf) -->
-  <div id="surat-modal" style="display:none; width: 210mm; background: white; padding: 20mm; color: black;" class="font-surat">
+  <!-- TEMPLATE SURAT TERSEMBUNYI (Off-screen positioning agar html2pdf tidak blank putih) -->
+  <div id="surat-modal" style="position: absolute; left: -9999px; top: 0; width: 210mm; background: white; padding: 20mm; color: black;" class="font-surat">
     <div style="text-align: center; border-bottom: 4px double black; padding-bottom: 12px; margin-bottom: 24px;">
       <h2 id="p-kop1" style="font-size: 14pt; font-weight: bold; text-transform: uppercase;">Rukun Tetangga 05 / Rukun Warga 23</h2>
       <h1 id="p-kop2" style="font-size: 16pt; font-weight: bold; text-transform: uppercase;">Kelurahan Cibeureum Kecamatan Cimahi Selatan</h1>
@@ -442,7 +436,7 @@
       // Ambil template pengaturan kop dari database
       const { data: tpl } = await supabase.from('pengaturan_surat').select('*').eq('id', 'default').single();
 
-      // Isi elemen template tersembunyi
+      // Isi elemen template
       if (tpl) {
         document.getElementById('p-kop1').textContent = tpl.kop_baris1 || '';
         document.getElementById('p-kop2').textContent = tpl.kop_baris2 || '';
@@ -469,7 +463,7 @@
       const tglSah = targetSurat.tgl_ttd ? new Date(targetSurat.tgl_ttd) : new Date();
       document.getElementById('p-tglttd').textContent = tglSah.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-      // Generate QR Code di template tersembunyi
+      // Generate QR Code di template
       const urlValidasi = `${window.location.origin}/validasi.html?id=${suratId}`;
       document.getElementById('p-qrcode').innerHTML = '';
       new QRCode(document.getElementById('p-qrcode'), {
@@ -481,9 +475,8 @@
         correctLevel: QRCode.CorrectLevel.M
       });
 
-      // Render dan Unduh PDF menggunakan html2pdf
+      // Render dan Unduh PDF menggunakan html2pdf tanpa blank putih
       const element = document.getElementById('surat-modal');
-      element.style.display = 'block';
 
       const opt = {
         margin:       10,
@@ -493,9 +486,7 @@
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
-      html2pdf().from(element).set(opt).save().then(() => {
-        element.style.display = 'none';
-      });
+      html2pdf().from(element).set(opt).save();
     };
 
     document.getElementById('search-surat').addEventListener('input', (e) => {
