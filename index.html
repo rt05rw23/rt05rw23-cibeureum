@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Resmi RT 05 / RW 23 - Kelurahan Cibeureum</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Library QR Code & html2pdf untuk unduh PDF otomatis -->
+  <!-- Library QR Code & html2pdf -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -260,8 +260,8 @@
     <p>&copy; 2026 Kepengurusan RT 05 / RW 23 Kelurahan Cibeureum. Dikelola secara digital untuk warga.</p>
   </footer>
 
-  <!-- TEMPLATE SURAT TERSEMBUNYI (Off-screen positioning agar html2pdf tidak blank putih) -->
-  <div id="surat-modal" style="position: absolute; left: -9999px; top: 0; width: 210mm; background: white; padding: 20mm; color: black;" class="font-surat">
+  <!-- TEMPLATE SURAT TERSEMBUNYI (Off-screen rendering agar html2pdf tidak blank) -->
+  <div id="surat-modal" style="position: absolute; left: -9999px; top: 0; width: 210mm; background: white; padding: 15mm; color: black;" class="font-surat">
     <div style="text-align: center; border-bottom: 4px double black; padding-bottom: 12px; margin-bottom: 24px;">
       <h2 id="p-kop1" style="font-size: 14pt; font-weight: bold; text-transform: uppercase;">Rukun Tetangga 05 / Rukun Warga 23</h2>
       <h1 id="p-kop2" style="font-size: 16pt; font-weight: bold; text-transform: uppercase;">Kelurahan Cibeureum Kecamatan Cimahi Selatan</h1>
@@ -316,7 +316,7 @@
     </div>
   </div>
 
-  <!-- Script Integrasi Supabase & Unduh PDF Otomatis -->
+  <!-- Script Integrasi Supabase & Unduh PDF -->
   <script type="module">
     import { supabase } from './js/config.js';
 
@@ -420,7 +420,7 @@
       }).join('');
     }
 
-    // Mekanisme Konfirmasi NIK & Unduh PDF Otomatis
+    // Mekanisme Konfirmasi NIK & Unduh PDF dengan Delay Rendering
     window.prosesUnduhPDF = async function(suratId, namaPemohon) {
       const inputNik = prompt(`Konfirmasi Keamanan Pemohon\n\nMasukkan 16 digit NIK milik Saudara/i "${namaPemohon}" untuk mengunduh surat pengantar ini:`);
       if (!inputNik) return;
@@ -433,10 +433,8 @@
 
       alert('NIK Sesuai! Menyiapkan dokumen PDF...');
 
-      // Ambil template pengaturan kop dari database
       const { data: tpl } = await supabase.from('pengaturan_surat').select('*').eq('id', 'default').single();
 
-      // Isi elemen template
       if (tpl) {
         document.getElementById('p-kop1').textContent = tpl.kop_baris1 || '';
         document.getElementById('p-kop2').textContent = tpl.kop_baris2 || '';
@@ -463,7 +461,6 @@
       const tglSah = targetSurat.tgl_ttd ? new Date(targetSurat.tgl_ttd) : new Date();
       document.getElementById('p-tglttd').textContent = tglSah.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-      // Generate QR Code di template
       const urlValidasi = `${window.location.origin}/validasi.html?id=${suratId}`;
       document.getElementById('p-qrcode').innerHTML = '';
       new QRCode(document.getElementById('p-qrcode'), {
@@ -475,18 +472,19 @@
         correctLevel: QRCode.CorrectLevel.M
       });
 
-      // Render dan Unduh PDF menggunakan html2pdf tanpa blank putih
-      const element = document.getElementById('surat-modal');
+      // Berikan jeda 500ms agar DOM & QR Code selesai dimuat sempurna sebelum diconvert ke PDF
+      setTimeout(() => {
+        const element = document.getElementById('surat-modal');
+        const opt = {
+          margin:       10,
+          filename:     `Surat_Pengantar_${targetSurat.nama_pemohon.replace(/\s+/g, '_')}.pdf`,
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true },
+          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
 
-      const opt = {
-        margin:       10,
-        filename:     `Surat_Pengantar_${targetSurat.nama_pemohon.replace(/\s+/g, '_')}.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      html2pdf().from(element).set(opt).save();
+        html2pdf().from(element).set(opt).save();
+      }, 500);
     };
 
     document.getElementById('search-surat').addEventListener('input', (e) => {
